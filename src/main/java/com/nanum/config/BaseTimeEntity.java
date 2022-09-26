@@ -1,4 +1,4 @@
-package com.nanum.userservice.config;
+package com.nanum.config;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;

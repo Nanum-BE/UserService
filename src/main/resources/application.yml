@@ -1,5 +1,5 @@
 server:
-  port: 0
+  port: 9010
 
 spring:
   application:
@@ -22,4 +22,8 @@ spring:
 eureka:
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+token:
+  expiration_time: 864000000
+  secret: 'iuyweiukfyuewkifuewikfuweikfuewikfuwekifuewik'
 

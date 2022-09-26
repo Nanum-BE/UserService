@@ -1,8 +1,7 @@
 package com.nanum.userservice.user.domain;
 
-import com.nanum.userservice.config.BaseTimeEntity;
-import com.nanum.userservice.config.Role;
-import lombok.AllArgsConstructor;
+import com.nanum.config.BaseTimeEntity;
+import com.nanum.config.Role;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +9,8 @@ import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
 
+@Data
 @Entity
-@Getter
-@Table(name = "user")
 @NoArgsConstructor
 public class User extends BaseTimeEntity {
 
@@ -28,11 +26,11 @@ public class User extends BaseTimeEntity {
     private String name;
 
     @Column(nullable = false)
-    private String encryptPwd;
+    private String pwd;
 
     @Column(nullable = false, unique = true)
     @Comment("사용자 닉네임")
-    private String nickName;
+    private String nickname;
 
     @Comment("프로필 사진 url")
     private String profileImgPath;
