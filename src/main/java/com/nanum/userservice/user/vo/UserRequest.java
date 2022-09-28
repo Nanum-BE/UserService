@@ -6,14 +6,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.annotations.Comment;
-import org.springframework.lang.Nullable;
 
 
 @Data
-public class RequestUser {
+public class UserRequest {
     @NotNull(message = "Email cannot be null")
+    @Schema(description = "이메일", defaultValue = "abcde@naver.com")
     @Size(min = 2, message = "Email not be less than two characters")
     @Email
     private String email;
@@ -29,9 +30,6 @@ public class RequestUser {
     @NotNull(message = "Nickname cannot be null")
     @Size(min = 1,message = "Nickname must be not be less than two characters")
     private String nickname;
-
-    @Nullable
-    private String profileImgUrl;
 
     @NotNull
     private String role;

@@ -3,43 +3,53 @@ package com.nanum.userservice.user.application;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
+import com.nanum.userservice.user.vo.UserRequest;
+import com.nanum.userservice.user.vo.UserResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository,
-                           BCryptPasswordEncoder bCryptPasswordEncoder) {
+    @Override
+    public void createUser(UserDto userDto) {
 
-        this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        userRepository.save(User.builder()
+                .email(userDto.getEmail())
+                .name(userDto.getName())
+                .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
+                .nickname(userDto.getNickname())
+                .profileImgPath(userDto.getProfileImgUrl())
+                .role(userDto.getRole())
+                .phone(userDto.getPhone())
+                .gender(userDto.getGender())
+                .build());
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
-        userDto.setPwd(bCryptPasswordEncoder.encode(userDto.getPwd()));
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        User user = mapper.map(userDto, User.class);
+    public boolean checkEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 
-        log.info(user.getEmail());
-        userRepository.save(user);
-
-        return mapper.map(userDto, UserDto.class);
+    @Override
+    public boolean checkNickName(String nickName) {
+        return userRepository.existsByNickname(nickName);
     }
 
     @Override
@@ -48,7 +58,43 @@ public class UserServiceImpl implements UserService {
         if (user == null)
             throw new UsernameNotFoundException(email);
 
-        return new ModelMapper().map(user, UserDto.class);
+        return UserDto.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .pwd(user.getPwd())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .phone(user.getPhone())
+                .profileImgUrl(user.getProfileImgPath())
+                .build();
+    }
+
+    @Override
+    public List<UserResponse> retrieveAllUsers() {
+        List<User> users = userRepository.findAll();
+
+        List<UserResponse> userResponses = new ArrayList<>();
+
+        users.forEach(user -> {
+            userResponses.add(UserResponse.builder()
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .build());
+        });
+
+        return userResponses;
+    }
+
+    @Override
+    public UserResponse retrieveUser(Long userId) {
+        User user = userRepository.findById(userId).get();
+
+        return UserResponse.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
     }
 
 
