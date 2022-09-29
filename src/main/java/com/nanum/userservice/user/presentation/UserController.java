@@ -83,18 +83,19 @@ public class UserController {
 
     @Operation(summary = "전체 사용자 조회 api", description = "모든 사용자들의 정보를 조회하기 위한 요청")
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> retrieveAllUsers() {
+    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveAllUsers() {
         List<UserResponse> userResponses = userService.retrieveAllUsers();
-
-        return ResponseEntity.status(HttpStatus.OK).body(userResponses);
+        BaseResponse<List<UserResponse>> responses = new BaseResponse<>(userResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
     @Operation(summary = "특정 사용자 정보 조회 api", description = "조회하고자 하는 특정 사용자의 정보 요청")
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> retrieveUser(@PathVariable Long userId) {
+    public ResponseEntity<BaseResponse<UserResponse>> retrieveUser(@PathVariable Long userId) {
         UserResponse response = userService.retrieveUser(userId);
+        BaseResponse<UserResponse> responses = new BaseResponse<>(response);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
 }

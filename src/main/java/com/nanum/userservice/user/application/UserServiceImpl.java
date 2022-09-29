@@ -1,6 +1,7 @@
 package com.nanum.userservice.user.application;
 
-import com.nanum.userservice.user.domain.UserEntity;
+import com.nanum.exception.PasswordDismatchException;
+import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.userservice.user.vo.UserResponse;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createUser(UserDto userDto) {
 
-        userRepository.save(UserEntity.builder()
+        userRepository.save(User.builder()
                 .email(userDto.getEmail())
                 .name(userDto.getName())
                 .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
@@ -50,32 +51,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserDetailsByEmail(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email);
-        if (userEntity == null)
+        User user = userRepository.findByEmail(email);
+        if (user == null)
             throw new UsernameNotFoundException(email);
 
         return UserDto.builder()
-                .userId(userEntity.getId())
-                .email(userEntity.getEmail())
-                .name(userEntity.getName())
-                .nickname(userEntity.getNickname())
-                .pwd(userEntity.getPwd())
-                .role(userEntity.getRole())
-                .gender(userEntity.getGender())
-                .phone(userEntity.getPhone())
+                .userId(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .pwd(user.getPwd())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .phone(user.getPhone())
                 .build();
     }
 
     @Override
     public List<UserResponse> retrieveAllUsers() {
-        List<UserEntity> userEntities = userRepository.findAll();
+        List<User> userEntities = userRepository.findAll();
 
         List<UserResponse> userResponses = new ArrayList<>();
 
-        userEntities.forEach(userEntity -> {
+        userEntities.forEach(user -> {
             userResponses.add(UserResponse.builder()
-                    .email(userEntity.getEmail())
-                    .name(userEntity.getName())
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .nickName(user.getNickname())
+                    .phone(user.getPhone())
+                    .isNoteReject(user.isNoteReject())
+                    .profileImgUrl(user.getProfileImgPath())
+                    .gender(user.getGender())
+                    .createAt(user.getCreateAt())
                     .build());
         });
 
@@ -84,23 +91,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse retrieveUser(Long userId) {
-        UserEntity userEntity = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId).get();
 
         return UserResponse.builder()
-                .name(userEntity.getName())
-                .email(userEntity.getEmail())
+                .name(user.getName())
+                .email(user.getEmail())
+                .nickName(user.getNickname())
+                .phone(user.getPhone())
+                .isNoteReject(user.isNoteReject())
+                .profileImgUrl(user.getProfileImgPath())
+                .gender(user.getGender())
+                .createAt(user.getCreateAt())
                 .build();
     }
 
-
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByEmail(username);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, PasswordDismatchException {
+        User user = userRepository.findByEmail(username);
 
-        if (userEntity == null)
-            throw new UsernameNotFoundException(username + ": not found");
+        if (user == null) {
+            throw new PasswordDismatchException();
+        }
 
-        return new org.springframework.security.core.userdetails.User(userEntity.getEmail(), userEntity.getPwd(),
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPwd(),
                 true, true, true, true,
                 new ArrayList<>());
     }

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,9 +21,21 @@ public class UserResponse {
     @Schema(description = "사용자 이름")
     private String name;
 
+    @Schema(description = "사용자 별명")
+    private String nickName;
+
     @Schema(description = "사용자 전화번호")
     private String phone;
 
     @Schema(description = "사용자 쪽지수신 허용 여부")
-    private String isNoteReject;
+    private boolean isNoteReject;
+
+    @Schema(description = "사용자 프로필 이미지")
+    private String profileImgUrl;
+
+    @Schema(description = "사용자 성별")
+    private String gender;
+
+    @Schema(description = "계정 생성일자")
+    private LocalDateTime createAt;
 }

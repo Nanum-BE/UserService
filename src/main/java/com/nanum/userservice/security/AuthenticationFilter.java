@@ -5,7 +5,7 @@ import com.nanum.config.BaseResponse;
 import com.nanum.exception.ExceptionResponse;
 import com.nanum.exception.PasswordDismatchException;
 import com.nanum.userservice.user.application.UserService;
-import com.nanum.userservice.user.domain.UserEntity;
+import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.userservice.user.vo.LoginRequest;
@@ -17,11 +17,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -31,7 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.BindException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -66,7 +64,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
             log.info(loginRequest.getEmail());
             log.info(loginRequest.getPwd());
-            UserEntity user = userRepository.findByEmail(loginRequest.getEmail());
+            User user = userRepository.findByEmail(loginRequest.getEmail());
 
 
             return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(
@@ -85,7 +83,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
-        String userName = ((User) authResult.getPrincipal()).getUsername();
+        String userName = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername();
         UserDto userDetails = userService.getUserDetailsByEmail(userName);
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userDetails.getUserId()));
@@ -117,10 +115,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        LocalDateTime date = LocalDateTime.now();
 
         ExceptionResponse mapBaseResponse = new ExceptionResponse();
+        mapBaseResponse.setMessage("이메일 혹은 비밀번호가 틀렸습니다");
+        mapBaseResponse.setTimestamp(String.valueOf(date));
+        mapBaseResponse.setDetails("BAD REQUEST");
         log.info(mapBaseResponse.getMessage());
-        log.info(mapBaseResponse.getTimestamp());
+
+
         new ObjectMapper().writeValue(response.getOutputStream(), mapBaseResponse);
 
     }
