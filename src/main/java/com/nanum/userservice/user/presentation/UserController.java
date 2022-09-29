@@ -4,7 +4,6 @@ import com.nanum.config.BaseResponse;
 import com.nanum.exception.DuplicateEmailException;
 import com.nanum.exception.DuplicateNickNameException;
 import com.nanum.userservice.user.application.UserService;
-import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.vo.UserRequest;
 import com.nanum.userservice.user.vo.UserResponse;
@@ -18,18 +17,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 
 @RestController
 @RequestMapping("/api")

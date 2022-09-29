@@ -1,21 +1,17 @@
 package com.nanum.userservice.user.application;
 
-import com.nanum.userservice.user.domain.User;
+import com.nanum.userservice.user.domain.UserEntity;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
-import com.nanum.userservice.user.vo.UserRequest;
 import com.nanum.userservice.user.vo.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -30,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createUser(UserDto userDto) {
 
-        userRepository.save(User.builder()
+        userRepository.save(UserEntity.builder()
                 .email(userDto.getEmail())
                 .name(userDto.getName())
                 .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
@@ -54,32 +50,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserDetailsByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        if (user == null)
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if (userEntity == null)
             throw new UsernameNotFoundException(email);
 
         return UserDto.builder()
-                .userId(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .nickname(user.getNickname())
-                .pwd(user.getPwd())
-                .role(user.getRole())
-                .gender(user.getGender())
-                .phone(user.getPhone())
+                .userId(userEntity.getId())
+                .email(userEntity.getEmail())
+                .name(userEntity.getName())
+                .nickname(userEntity.getNickname())
+                .pwd(userEntity.getPwd())
+                .role(userEntity.getRole())
+                .gender(userEntity.getGender())
+                .phone(userEntity.getPhone())
                 .build();
     }
 
     @Override
     public List<UserResponse> retrieveAllUsers() {
-        List<User> users = userRepository.findAll();
+        List<UserEntity> userEntities = userRepository.findAll();
 
         List<UserResponse> userResponses = new ArrayList<>();
 
-        users.forEach(user -> {
+        userEntities.forEach(userEntity -> {
             userResponses.add(UserResponse.builder()
-                    .email(user.getEmail())
-                    .name(user.getName())
+                    .email(userEntity.getEmail())
+                    .name(userEntity.getName())
                     .build());
         });
 
@@ -88,23 +84,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse retrieveUser(Long userId) {
-        User user = userRepository.findById(userId).get();
+        UserEntity userEntity = userRepository.findById(userId).get();
 
         return UserResponse.builder()
-                .name(user.getName())
-                .email(user.getEmail())
+                .name(userEntity.getName())
+                .email(userEntity.getEmail())
                 .build();
     }
 
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
+        UserEntity userEntity = userRepository.findByEmail(username);
 
-        if (user == null)
+        if (userEntity == null)
             throw new UsernameNotFoundException(username + ": not found");
 
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPwd(),
+        return new org.springframework.security.core.userdetails.User(userEntity.getEmail(), userEntity.getPwd(),
                 true, true, true, true,
                 new ArrayList<>());
     }
