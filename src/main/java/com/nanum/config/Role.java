@@ -1,4 +1,4 @@
-package com.nanum.userservice.config;
+package com.nanum.config;
 
 public enum Role {
     USER("사용자"),
