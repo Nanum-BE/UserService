@@ -1,5 +1,5 @@
 server:
-  port: 9010
+  port: 9091
 
 spring:
   profiles:
@@ -24,20 +24,11 @@ spring:
         show_sql: false
     show_sql: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-
-eureka:
-  instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://20.214.170.222:8761/eureka
 
 token:
   expiration_time: 864000000

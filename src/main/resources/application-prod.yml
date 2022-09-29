@@ -1,6 +1,16 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://user-service-db.chggg0w4gyxa.ap-northeast-2.rds.amazonaws.com/userDB?serverTimezone=Asia/Seoul"
+    url: "jdbc:mysql://user-service-db.chggg0w4gyxa.ap-northeast-2.rds.amazonaws.com:3306/userDB?serverTimezone=Asia/Seoul"
+
     username: nanum
     password: spharos1234!
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://20.214.170.222:8761/eureka

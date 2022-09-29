@@ -4,7 +4,6 @@ import com.nanum.config.BaseResponse;
 import com.nanum.exception.DuplicateEmailException;
 import com.nanum.exception.DuplicateNickNameException;
 import com.nanum.userservice.user.application.UserService;
-import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.vo.UserRequest;
 import com.nanum.userservice.user.vo.UserResponse;
@@ -18,18 +17,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 
 @RestController
 @RequestMapping("/api")
@@ -90,18 +83,19 @@ public class UserController {
 
     @Operation(summary = "전체 사용자 조회 api", description = "모든 사용자들의 정보를 조회하기 위한 요청")
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> retrieveAllUsers() {
+    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveAllUsers() {
         List<UserResponse> userResponses = userService.retrieveAllUsers();
-
-        return ResponseEntity.status(HttpStatus.OK).body(userResponses);
+        BaseResponse<List<UserResponse>> responses = new BaseResponse<>(userResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
     @Operation(summary = "특정 사용자 정보 조회 api", description = "조회하고자 하는 특정 사용자의 정보 요청")
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> retrieveUser(@PathVariable Long userId) {
+    public ResponseEntity<BaseResponse<UserResponse>> retrieveUser(@PathVariable Long userId) {
         UserResponse response = userService.retrieveUser(userId);
+        BaseResponse<UserResponse> responses = new BaseResponse<>(response);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
 }

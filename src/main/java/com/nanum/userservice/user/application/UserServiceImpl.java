@@ -1,21 +1,18 @@
 package com.nanum.userservice.user.application;
 
+import com.nanum.exception.PasswordDismatchException;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
-import com.nanum.userservice.user.vo.UserRequest;
 import com.nanum.userservice.user.vo.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -72,14 +69,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> retrieveAllUsers() {
-        List<User> users = userRepository.findAll();
+        List<User> userEntities = userRepository.findAll();
 
         List<UserResponse> userResponses = new ArrayList<>();
 
-        users.forEach(user -> {
+        userEntities.forEach(user -> {
             userResponses.add(UserResponse.builder()
                     .email(user.getEmail())
                     .name(user.getName())
+                    .nickName(user.getNickname())
+                    .phone(user.getPhone())
+                    .isNoteReject(user.isNoteReject())
+                    .profileImgUrl(user.getProfileImgPath())
+                    .gender(user.getGender())
+                    .createAt(user.getCreateAt())
                     .build());
         });
 
@@ -93,16 +96,22 @@ public class UserServiceImpl implements UserService {
         return UserResponse.builder()
                 .name(user.getName())
                 .email(user.getEmail())
+                .nickName(user.getNickname())
+                .phone(user.getPhone())
+                .isNoteReject(user.isNoteReject())
+                .profileImgUrl(user.getProfileImgPath())
+                .gender(user.getGender())
+                .createAt(user.getCreateAt())
                 .build();
     }
 
-
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, PasswordDismatchException {
         User user = userRepository.findByEmail(username);
 
-        if (user == null)
-            throw new UsernameNotFoundException(username + ": not found");
+        if (user == null) {
+            throw new PasswordDismatchException();
+        }
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPwd(),
                 true, true, true, true,

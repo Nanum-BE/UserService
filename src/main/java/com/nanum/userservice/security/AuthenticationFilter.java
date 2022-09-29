@@ -1,7 +1,11 @@
 package com.nanum.userservice.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nanum.config.BaseResponse;
+import com.nanum.exception.ExceptionResponse;
+import com.nanum.exception.PasswordDismatchException;
 import com.nanum.userservice.user.application.UserService;
+import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.userservice.user.vo.LoginRequest;
@@ -10,59 +14,62 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Slf4j
-
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private UserService userService;
     private Environment env;
-    private PasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
     private final ObjectMapper mapper;
     private UserRepository userRepository;
+    private final UserDetailsService userDetailsService;
 
     public AuthenticationFilter(UserService userService, Environment env, AuthenticationManager authenticationManager,
-                                ObjectMapper mapper, PasswordEncoder passwordEncoder) {
+                                ObjectMapper mapper,
+                                BCryptPasswordEncoder passwordEncoder,
+                                UserDetailsService userDetailsService,
+                                UserRepository userRepository) {
         super.setAuthenticationManager(authenticationManager);
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.env = env;
         this.mapper = mapper;
+        this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException {
+                                                HttpServletResponse response)
+            throws AuthenticationException, PasswordDismatchException {
         try {
-            LoginRequest creds = new ObjectMapper().readValue(request.getInputStream(), LoginRequest.class);
-//            UserDto userDetailsByEmail = userService.getUserDetailsByEmail(creds.getEmail());
-//            com.nanum.userservice.user.domain.User user = userRepository.findById(userDetailsByEmail.getUserId()).get();
-//            if (!passwordEncoder.matches(creds.getPwd(), user.getPwd())) {
-//                throw new BadCredentialsException("비밀번호가 일치하지 않습니다");
-//            }
+            LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
+            log.info(loginRequest.getEmail());
+            log.info(loginRequest.getPwd());
+            User user = userRepository.findByEmail(loginRequest.getEmail());
+
+
             return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(
-                            creds.getEmail(),
-                            creds.getPwd(),
+                            loginRequest.getEmail(),
+                            loginRequest.getPwd(),
                             new ArrayList<>()
                     )
             );
@@ -76,7 +83,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
-        String userName = ((User) authResult.getPrincipal()).getUsername();
+        String userName = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername();
         UserDto userDetails = userService.getUserDetailsByEmail(userName);
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userDetails.getUserId()));
@@ -98,12 +105,26 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         Map<String, String> tokenDto = new HashMap<>();
         tokenDto.put("accessToken", token);
 
-        mapper.writeValue(response.getWriter(), tokenDto);
+        BaseResponse<Map<String, String>> baseResponse = new BaseResponse<>(tokenDto);
+        mapper.writeValue(response.getWriter(), baseResponse);
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response
-            , AuthenticationException failed) throws IOException, ServletException {
-        super.unsuccessfulAuthentication(request, response, failed);
+            , AuthenticationException failed) throws IOException, PasswordDismatchException {
+
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        LocalDateTime date = LocalDateTime.now();
+
+        ExceptionResponse mapBaseResponse = new ExceptionResponse();
+        mapBaseResponse.setMessage("이메일 혹은 비밀번호가 틀렸습니다");
+        mapBaseResponse.setTimestamp(String.valueOf(date));
+        mapBaseResponse.setDetails("BAD REQUEST");
+        log.info(mapBaseResponse.getMessage());
+
+
+        new ObjectMapper().writeValue(response.getOutputStream(), mapBaseResponse);
+
     }
 }
