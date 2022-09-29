@@ -1,12 +1,13 @@
 package com.nanum.userservice.user.infrastructure;
 
-import com.nanum.userservice.user.domain.User;
+import com.nanum.userservice.user.domain.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByNickname(String nickName);
 
-    User findByEmail(String username);
+    UserEntity findByEmail(String username);
 }
