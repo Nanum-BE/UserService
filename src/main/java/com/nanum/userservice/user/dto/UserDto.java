@@ -17,9 +17,8 @@ public class UserDto {
     private String name;
     private String pwd;
     private String nickname;
-    private String profileImgUrl;
     private Role role;
     private String phone;
     private String gender;
-
+    private boolean isNoteReject;
 }

@@ -35,10 +35,10 @@ public class UserServiceImpl implements UserService {
                 .name(userDto.getName())
                 .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
                 .nickname(userDto.getNickname())
-                .profileImgPath(userDto.getProfileImgUrl())
                 .role(userDto.getRole())
                 .phone(userDto.getPhone())
                 .gender(userDto.getGender())
+                .isNoteReject(userDto.isNoteReject())
                 .build());
     }
 
@@ -59,15 +59,14 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException(email);
 
         return UserDto.builder()
+                .userId(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .userId(user.getId())
                 .nickname(user.getNickname())
                 .pwd(user.getPwd())
                 .role(user.getRole())
                 .gender(user.getGender())
                 .phone(user.getPhone())
-                .profileImgUrl(user.getProfileImgPath())
                 .build();
     }
 

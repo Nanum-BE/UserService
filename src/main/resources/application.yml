@@ -2,6 +2,8 @@ server:
   port: 9010
 
 spring:
+  profiles:
+    include: prod
   redis:
     lettuce:
       pool:
@@ -13,6 +15,7 @@ spring:
     password: 1234
   application:
     name: user-service
+
   jpa:
     generate-ddl: true
     properties:
@@ -20,7 +23,6 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         show_sql: false
     show_sql: false
-    database: mysql
     hibernate:
       ddl-auto: create
 
