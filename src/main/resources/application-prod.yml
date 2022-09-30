@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://user-service-db.chggg0w4gyxa.ap-northeast-2.rds.amazonaws.com:3306/userDB?serverTimezone=Asia/Seoul"
+    url: "jdbc:mysql://user-service-db.chggg0w4gyxa.ap-northeast-2.rds.amazonaws.com:3306/userDB?useSSL=false&autoReconnect=true&allowMultiQueries=true&serverTimezone=UTC"
 
     username: nanum
     password: spharos1234!
