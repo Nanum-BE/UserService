@@ -1,7 +1,6 @@
 package com.nanum.userservice.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nanum.exception.PasswordDismatchException;
 import com.nanum.userservice.user.application.UserService;
 import com.nanum.userservice.user.infrastructure.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @Slf4j

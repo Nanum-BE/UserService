@@ -3,8 +3,13 @@ package com.nanum.userservice.user.presentation;
 import com.nanum.config.BaseResponse;
 import com.nanum.exception.DuplicateEmailException;
 import com.nanum.exception.DuplicateNickNameException;
+import com.nanum.exception.PasswordDismatchException;
 import com.nanum.userservice.user.application.UserService;
+import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
+import com.nanum.userservice.user.infrastructure.UserRepository;
+import com.nanum.userservice.user.vo.ModifyPasswordRequest;
+import com.nanum.userservice.user.vo.UserModifyRequest;
 import com.nanum.userservice.user.vo.UserRequest;
 import com.nanum.userservice.user.vo.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,13 +24,16 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @Tag(name = "사용자", description = "사용자 관련 api")
 @Slf4j
 @RequiredArgsConstructor
@@ -40,8 +48,10 @@ import java.util.List;
                 content = @Content(schema = @Schema(implementation = BaseResponse.class))),
 })
 public class UserController {
-
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     private final UserService userService;
+    private final UserRepository userRepository;
+
 
     @Operation(summary = "사용자 회원가입 API", description = "사용자가 회원가입을 하기 위한 요청")
     @PostMapping("/signup")
@@ -61,7 +71,7 @@ public class UserController {
     }
 
     @Operation(summary = "회원가입시 이메일 중복검사 api", description = "이메일 중복검사를 하기 위한 요청")
-    @GetMapping("/signup/email/{email}")
+    @GetMapping("/check/email/{email}")
     public ResponseEntity<?> checkEmail(@PathVariable String email) {
         if (userService.checkEmail(email)) {
             throw new DuplicateEmailException();
@@ -69,9 +79,9 @@ public class UserController {
             return ResponseEntity.ok("사용 가능한 이메일입니다");
         }
     }
-    
+
     @Operation(summary = "회원가입시 닉네임 중복검사 api", description = "닉네임 중복검사를 하기 위한 요청")
-    @GetMapping("/signup/nickname/{nickName}")
+    @GetMapping("/check/nickname/{nickName}")
     public ResponseEntity<?> checkNickName(@PathVariable String nickName) {
 
         if (userService.checkNickName(nickName)) {
@@ -98,4 +108,45 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
+    @Operation(summary = "사용자 정보수정", description = "수정된 정보로 다시 사용자 정보 수정하는 요청")
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<BaseResponse<String>> modifyUser(@PathVariable Long userId,
+                                                           @RequestBody UserModifyRequest request,
+                                                           @RequestPart(value = "profileImg", required = false)
+                                                                   MultipartFile file) {
+        userService.modifyUser(userId, request, file);
+
+        String result = "회원정보 수정이 완료되었습니다";
+        BaseResponse<String> response = new BaseResponse<>(result);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(summary = "기존 비밀번화와 일치하는지", description = "비밀번호 변경전 기존 비밀번호가 일치하는지")
+    @GetMapping("/check/{userId}/pwd/{pwd}")
+    public ResponseEntity<BaseResponse<String>> checkPw(@PathVariable Long userId, @PathVariable String pwd) {
+
+        User user = userRepository.findById(userId).get();
+        String result = "기존 비밀번호와 일치합니다";
+        BaseResponse<String> response = new BaseResponse<>(result);
+
+        if (!bCryptPasswordEncoder.matches(pwd, user.getPwd())) {
+            throw new PasswordDismatchException();
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "비밀번호 변경하기 위한 요청")
+    @PutMapping("/users/{userId}/pw")
+    public ResponseEntity<BaseResponse<String>> modifyUserPassword(@PathVariable Long userId,
+                                                     @RequestBody ModifyPasswordRequest passwordRequest) {
+        userService.modifyUserPw(userId, passwordRequest);
+
+        String result = "비밀번호 변경이 완료되었습니다";
+        BaseResponse<String> response = new BaseResponse<>(result);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
