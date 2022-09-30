@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    include: local
+    include: prod
   redis:
     lettuce:
       pool:
