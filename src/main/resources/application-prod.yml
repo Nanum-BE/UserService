@@ -4,8 +4,10 @@ spring:
     url: "jdbc:mysql://user-service-db.chggg0w4gyxa.ap-northeast-2.rds.amazonaws.com:3306/userDB?useSSL=false&autoReconnect=true&allowMultiQueries=true&serverTimezone=UTC"
 #    타임 아웃 설정 필수
     hikari:
-      idle-timeout: 300
-      max-lifetime: 300
+      idle-timeout: 100000
+      max-lifetime: 580000
+      connection-timeout: 10000
+      validation-timeout: 10000
     username: nanum
     password: spharos1234!
 
