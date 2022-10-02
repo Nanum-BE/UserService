@@ -25,4 +25,8 @@ public interface UserService extends UserDetailsService {
     List<UserResponse> retrieveAllUsers();
 
     UserResponse retrieveUser(Long userId);
+
+    // 박
+    List<UserResponse> retrieveUsersByUserIds(List Longs);
+
 }

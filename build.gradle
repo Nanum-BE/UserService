@@ -39,10 +39,14 @@ dependencies {
     // bus 추가
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
+    // kafka 추가
+    implementation 'org.springframework.kafka:spring-kafka:2.9.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+
 }
 
 dependencyManagement {

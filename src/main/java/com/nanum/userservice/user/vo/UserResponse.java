@@ -1,5 +1,6 @@
 package com.nanum.userservice.user.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
     @Schema(description = "사용자 이메일", defaultValue = "spharos@gmail.com")
     private String email;
@@ -38,4 +39,7 @@ public class UserResponse {
 
     @Schema(description = "계정 생성일자")
     private LocalDateTime createAt;
+
+    @Schema(description = "계정 ID")
+    private Long userId;
 }

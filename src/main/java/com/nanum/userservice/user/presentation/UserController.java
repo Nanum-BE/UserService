@@ -150,4 +150,14 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @Operation(summary = "특정 전체 사용자 조회 api", description = "특정 모든 사용자들의 정보를 조회하기 위한 요청(ps id가 2이상일때만 사용가능)")
+    @GetMapping("/users/particular")
+    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveUsersById(@RequestParam(value="param", required=false, defaultValue="")
+                                                                                  List<Long> params) {
+
+        List<UserResponse> userResponses = userService.retrieveUsersByUserIds(params);
+        BaseResponse<List<UserResponse>> responses = new BaseResponse<>(userResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
 }
