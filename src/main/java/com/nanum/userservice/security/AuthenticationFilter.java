@@ -3,7 +3,7 @@ package com.nanum.userservice.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nanum.config.BaseResponse;
 import com.nanum.exception.ExceptionResponse;
-import com.nanum.exception.PasswordDismatchException;
+import com.nanum.exception.InformationDismatchException;
 import com.nanum.userservice.user.application.UserService;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
@@ -59,7 +59,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response)
-            throws AuthenticationException, PasswordDismatchException {
+            throws AuthenticationException, InformationDismatchException {
         try {
             LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
             log.info(loginRequest.getEmail());
@@ -111,7 +111,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response
-            , AuthenticationException failed) throws IOException, PasswordDismatchException {
+            , AuthenticationException failed) throws IOException, InformationDismatchException {
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

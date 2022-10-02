@@ -19,14 +19,14 @@ import java.util.Objects;
 public class PhoneAuthController {
     private final PhoneAuthServiceImpl phoneAuthServiceImpl;
 
-    @PostMapping("/sms/sends")
+    @PostMapping("/v1/sms/sends")
     public ResponseEntity<ResponseSMS> createMessage(@RequestBody RequestSMS requestSMS) {
 
         ResponseSMS response = phoneAuthServiceImpl.sendRandomMessage(requestSMS.getPhoneNumber());
         return ResponseEntity.ok().body(response);
     }
 
-    @PostMapping("/sms/confirm")
+    @PostMapping("/v1/sms/confirm")
     public ResponseEntity<String> ConfirmMessage(@RequestBody RequestSMS requestSMS) {
         String message = phoneAuthServiceImpl.confirmMessage(requestSMS);
         String value;

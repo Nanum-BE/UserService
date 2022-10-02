@@ -5,10 +5,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class PasswordDismatchException extends IllegalArgumentException {
-    private final static String Message = "이메일 혹은 비밀번호가 틀렸습니다";
+    private final static String Message = "기존 비밀번호를 다시 확인하세요";
 
     public PasswordDismatchException() {
         super(Message);
     }
 }
-
