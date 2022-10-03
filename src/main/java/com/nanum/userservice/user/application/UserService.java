@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface UserService extends UserDetailsService {
-    void createUser(UserDto userDto);
+    void createUser(UserDto userDto, MultipartFile multipartFile);
 
     boolean checkEmail(String email);
 

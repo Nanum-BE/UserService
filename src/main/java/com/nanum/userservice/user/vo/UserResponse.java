@@ -18,9 +18,6 @@ public class UserResponse {
     @Schema(description = "사용자 이메일", defaultValue = "spharos@gmail.com")
     private String email;
 
-    @Schema(description = "사용자 이름")
-    private String name;
-
     @Schema(description = "사용자 별명")
     private String nickName;
 

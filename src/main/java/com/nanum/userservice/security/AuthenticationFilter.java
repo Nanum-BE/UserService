@@ -12,6 +12,7 @@ import com.nanum.userservice.user.vo.LoginRequest;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -33,28 +34,13 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private UserService userService;
-    private Environment env;
-    private BCryptPasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final Environment env;
     private final ObjectMapper mapper;
-    private UserRepository userRepository;
-    private final UserDetailsService userDetailsService;
 
-    public AuthenticationFilter(UserService userService, Environment env, AuthenticationManager authenticationManager,
-                                ObjectMapper mapper,
-                                BCryptPasswordEncoder passwordEncoder,
-                                UserDetailsService userDetailsService,
-                                UserRepository userRepository) {
-        super.setAuthenticationManager(authenticationManager);
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.env = env;
-        this.mapper = mapper;
-        this.userDetailsService = userDetailsService;
-        this.userRepository = userRepository;
-    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -64,7 +50,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
             log.info(loginRequest.getEmail());
             log.info(loginRequest.getPwd());
-            User user = userRepository.findByEmail(loginRequest.getEmail());
 
 
             return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(
@@ -87,7 +72,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         UserDto userDetails = userService.getUserDetailsByEmail(userName);
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userDetails.getUserId()));
-        claims.put("name", userDetails.getName());
+//        claims.put("name", userDetails.getEmail());
 
         String token = Jwts.builder()
                 .setClaims(claims)

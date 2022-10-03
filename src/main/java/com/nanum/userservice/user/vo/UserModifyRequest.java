@@ -27,11 +27,6 @@ public class UserModifyRequest {
     @Size(min = 1,message = "Nickname must be not be less than two characters")
     private String nickname;
 
-    @NotNull(message = "Name cannot be null")
-    @Schema(description = "사용자 이름", defaultValue = "강민수")
-    @Size(min = 2, message = "Name not be less than two characters")
-    private String name;
-
     @NotNull
     @Schema(description = "사용자 성별", defaultValue = "1")
     @Comment("0번은 여자, 1번은 남자로 구분해서 나눈다")

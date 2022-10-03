@@ -19,11 +19,6 @@ public class UserRequest {
     @Email
     private String email;
 
-    @NotNull(message = "Name cannot be null")
-    @Schema(description = "사용자 이름", defaultValue = "강민수")
-    @Size(min = 2, message = "Name not be less than two characters")
-    private String name;
-
     @NotNull(message = "Password cannot be null")
     @Schema(description = "사용자 비밀번호", defaultValue = "123456789")
     @Size(min = 8, message = "Password must be equal or grater than 8 characters")
@@ -46,7 +41,7 @@ public class UserRequest {
     @NotNull
     @Schema(description = "사용자 성별", defaultValue = "1")
     @Comment("0번은 여자, 1번은 남자로 구분해서 나눈다")
-    private int gender;
+    private String gender;
 
     @NotNull
     @Schema(description = "쪽지수신 허용 여부", defaultValue = "false")

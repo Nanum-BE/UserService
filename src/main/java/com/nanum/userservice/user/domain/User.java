@@ -12,6 +12,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 
 @Getter
@@ -28,11 +31,6 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
-    @Comment("사용자 실명")
-    private String name;
-
-    @Column(nullable = false)
     private String pwd;
 
     @Column(nullable = false, unique = true)
@@ -41,29 +39,46 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Comment("프로필 사진 url")
     private String profileImgPath;
+    
+    @Comment("사진의 원본 이름")
+    private String originName;
+    
+    @Comment("사진 저장 이름")
+    private String saveName;
 
     @Comment("사용자면 USER, 호스트면 HOST")
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(nullable = false, unique = true)
+//    @Column(nullable = false, unique = true)
     private String phone;
 
     @Comment("사용자의 성별, 남자면 1로 표시하고 여자면 0로 표시")
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String gender;
 
     @Comment("사용자 쪽지수신 동의 여부, true -> 1/ false -> 0")
-    @Column(nullable = false)
+    @Schema(defaultValue = "0")
     private boolean isNoteReject;
 
     @Comment("경고횟수")
-    @Column(nullable = false)
+    @Schema(defaultValue = "0")
     private int warnCnt;
 
     @Comment("로그인 실패 횟수")
     @Schema(defaultValue = "0")
     private int loginFailCnt;
+
+    @Comment("소셜 로그인 여부")
+    private String socialType;
+
+//    private Timestamp loginDate;
+//
+//
+//    public User updateLoginDate() {
+//        loginDate = Timestamp.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+//        return this;
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -99,4 +114,5 @@ public class User extends BaseTimeEntity implements UserDetails {
     public boolean isEnabled() {
         return false;
     }
+
 }

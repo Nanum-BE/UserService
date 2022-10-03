@@ -1,13 +1,15 @@
 package com.nanum.userservice.user.application;
 
 import com.nanum.exception.InformationDismatchException;
-import com.nanum.exception.PasswordDismatchException;
+import com.nanum.exception.ProfileImgNotFoundException;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.userservice.user.vo.ModifyPasswordRequest;
 import com.nanum.userservice.user.vo.UserModifyRequest;
 import com.nanum.userservice.user.vo.UserResponse;
+import com.nanum.utils.s3.S3UploaderService;
+import com.nanum.utils.s3.dto.S3UploadDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -18,9 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -29,20 +31,36 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final S3UploaderService s3UploaderService;
 
     @Override
-    public void createUser(UserDto userDto) {
+    public void createUser(UserDto userDto, MultipartFile multipartFile) {
+        User user = userDto.userDtoToEntity();
+        S3UploadDto s3UploadDto;
 
-        userRepository.save(User.builder()
-                .email(userDto.getEmail())
-                .name(userDto.getName())
-                .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
-                .nickname(userDto.getNickname())
-                .role(userDto.getRole())
-                .phone(userDto.getPhone())
-                .gender(userDto.getGender())
-                .isNoteReject(userDto.isNoteReject())
-                .build());
+        if (multipartFile != null) {
+            try {
+                s3UploadDto = s3UploaderService.upload(multipartFile, "myspharosbucket", "userProfile");
+
+                User.builder()
+                        .email(userDto.getEmail())
+                        .pwd(userDto.getPwd())
+                        .nickname(userDto.getNickname())
+                        .role(userDto.getRole())
+                        .phone(userDto.getPhone())
+                        .gender(userDto.getGender())
+                        .isNoteReject(user.isNoteReject())
+                        .profileImgPath(s3UploadDto.getImgUrl())
+                        .saveName(s3UploadDto.getSaveName())
+                        .originName(s3UploadDto.getOriginName())
+                        .build();
+
+            } catch (IOException e) {
+                throw new ProfileImgNotFoundException();
+            }
+        }
+
+        userRepository.save(user);
     }
 
     @Override
@@ -65,7 +83,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(User.builder()
                 .id(userId)
                 .email(user.getEmail())
-                .name(request.getName())
                 .role(user.getRole())
                 .loginFailCnt(user.getLoginFailCnt())
                 .warnCnt(user.getWarnCnt())
@@ -81,20 +98,19 @@ public class UserServiceImpl implements UserService {
     public void modifyUserPw(Long userId, ModifyPasswordRequest passwordRequest) {
         User user = userRepository.findById(userId).get();
 
-            userRepository.save(User.builder()
-                    .id(user.getId())
-                    .name(user.getName())
-                    .email(user.getEmail())
-                    .gender(user.getGender())
-                    .warnCnt(user.getWarnCnt())
-                    .loginFailCnt(user.getLoginFailCnt())
-                    .role(user.getRole())
-                    .nickname(user.getNickname())
-                    .phone(user.getPhone())
-                    .profileImgPath(user.getProfileImgPath())
-                    .isNoteReject(user.isNoteReject())
-                    .pwd(bCryptPasswordEncoder.encode(passwordRequest.getNewPw()))
-                    .build());
+        userRepository.save(User.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .gender(user.getGender())
+                .warnCnt(user.getWarnCnt())
+                .loginFailCnt(user.getLoginFailCnt())
+                .role(user.getRole())
+                .nickname(user.getNickname())
+                .phone(user.getPhone())
+                .profileImgPath(user.getProfileImgPath())
+                .isNoteReject(user.isNoteReject())
+                .pwd(bCryptPasswordEncoder.encode(passwordRequest.getNewPw()))
+                .build());
     }
 
     @Override
@@ -106,7 +122,6 @@ public class UserServiceImpl implements UserService {
         return UserDto.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
-                .name(user.getName())
                 .nickname(user.getNickname())
                 .pwd(user.getPwd())
                 .role(user.getRole())
@@ -124,7 +139,6 @@ public class UserServiceImpl implements UserService {
         userEntities.forEach(user -> {
             userResponses.add(UserResponse.builder()
                     .email(user.getEmail())
-                    .name(user.getName())
                     .nickName(user.getNickname())
                     .phone(user.getPhone())
                     .isNoteReject(user.isNoteReject())
@@ -142,7 +156,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId).get();
 
         return UserResponse.builder()
-                .name(user.getName())
                 .email(user.getEmail())
                 .nickName(user.getNickname())
                 .phone(user.getPhone())

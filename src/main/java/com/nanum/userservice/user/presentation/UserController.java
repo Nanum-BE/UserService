@@ -56,7 +56,8 @@ public class UserController {
 
     @Operation(summary = "사용자 회원가입 API", description = "사용자가 회원가입을 하기 위한 요청")
     @PostMapping("/signup")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody UserRequest userRequest) {
+    public ResponseEntity<Object> createUser(@Valid @RequestPart UserRequest userRequest,
+                                             @RequestPart(value = "profileImg", required = false) MultipartFile multipartFile) {
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -66,29 +67,37 @@ public class UserController {
         String result = "회원가입이 완료되었습니다";
         BaseResponse<String> response = new BaseResponse<>(result);
 
-        userService.createUser(userDto);
+        if (multipartFile!=null) {
+            userService.createUser(userDto, multipartFile);
+        } else {
+            userService.createUser(userDto, null);
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "회원가입시 이메일 중복검사 api", description = "이메일 중복검사를 하기 위한 요청")
     @GetMapping("/check/email/{email}")
-    public ResponseEntity<?> checkEmail(@PathVariable String email) {
+    public ResponseEntity<BaseResponse<String>> checkEmail(@PathVariable String email) {
+        String result = "사용 가능한 이메일입니다";
+        BaseResponse<String> response = new BaseResponse<>(result);
         if (userService.checkEmail(email)) {
             throw new DuplicateEmailException();
         } else {
-            return ResponseEntity.ok("사용 가능한 이메일입니다");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
 
     @Operation(summary = "회원가입시 닉네임 중복검사 api", description = "닉네임 중복검사를 하기 위한 요청")
     @GetMapping("/check/nickname/{nickName}")
-    public ResponseEntity<?> checkNickName(@PathVariable String nickName) {
+    public ResponseEntity<BaseResponse<String>> checkNickName(@PathVariable String nickName) {
+        String result = "사용 가능한 닉네임입니다";
+        BaseResponse<String> response = new BaseResponse<>(result);
 
         if (userService.checkNickName(nickName)) {
             throw new DuplicateNickNameException();
         } else {
-            return ResponseEntity.ok("사용 가능한 닉네임입니다");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
 
