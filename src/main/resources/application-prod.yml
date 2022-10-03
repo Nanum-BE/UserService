@@ -2,10 +2,20 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: "jdbc:mysql://user-service-db.chggg0w4gyxa.ap-northeast-2.rds.amazonaws.com:3306/userDB?useSSL=false&autoReconnect=true&allowMultiQueries=true&serverTimezone=UTC"
-
+#    타임 아웃 설정 필수
+    hikari:
+      idle-timeout: 100000
+      max-lifetime: 580000
+      connection-timeout: 10000
+      validation-timeout: 10000
     username: nanum
     password: spharos1234!
 
+  rabbitmq:
+    port: 5672
+    username: guest
+    password: guest
+    host: 20.214.170.222
 eureka:
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
@@ -14,3 +24,9 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://20.214.170.222:8761/eureka
+#      defaultZone: http://127.0.0.1:8761/eureka
+management:
+  endpoints:
+    web:
+      exposure:
+        include: busrefresh, health

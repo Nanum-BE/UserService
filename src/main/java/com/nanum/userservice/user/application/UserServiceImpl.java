@@ -2,6 +2,7 @@ package com.nanum.userservice.user.application;
 
 import com.nanum.exception.InformationDismatchException;
 import com.nanum.exception.ProfileImgNotFoundException;
+import com.nanum.exception.UserNotFoundException;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -151,9 +153,16 @@ public class UserServiceImpl implements UserService {
         return userResponses;
     }
 
+    // 박찬흠 수정함
     @Override
     public UserResponse retrieveUser(Long userId) {
-        User user = userRepository.findById(userId).get();
+
+        Optional<User> userEntity = userRepository.findById(userId);
+        if(userEntity.isEmpty()){
+            throw new UserNotFoundException(String.format("ID[%s] not found",userId));
+        }
+//        User user = userRepository.findById(userId).get();
+        User user = userEntity.get();
 
         return UserResponse.builder()
                 .email(user.getEmail())
@@ -164,6 +173,31 @@ public class UserServiceImpl implements UserService {
                 .gender(user.getGender())
                 .createAt(user.getCreateAt())
                 .build();
+    }
+
+    @Override
+    public List<UserResponse> retrieveUsersByUserIds(List Longs) {
+        List<User> users = userRepository.findAllById(Longs);
+        if(users.size()<1){
+            throw new UserNotFoundException(String.format("users[%s] not found", Longs));
+        }
+
+        List<UserResponse> userResponses = new ArrayList<>();
+
+        users.forEach(user -> {
+            userResponses.add(UserResponse.builder()
+                    .email(user.getEmail())
+                    .nickName(user.getNickname())
+                    .phone(user.getPhone())
+                    .isNoteReject(user.isNoteReject())
+                    .profileImgUrl(user.getProfileImgPath())
+                    .gender(user.getGender())
+                    .createAt(user.getCreateAt())
+                    .userId(user.getId())
+                    .build());
+        });
+
+        return userResponses;
     }
 
     @Override
