@@ -1,6 +1,5 @@
 package com.nanum.userservice.user.application;
 
-import com.nanum.exception.InformationDismatchException;
 import com.nanum.exception.ProfileImgNotFoundException;
 import com.nanum.exception.UserNotFoundException;
 import com.nanum.userservice.user.domain.User;
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void createUser(UserDto userDto, MultipartFile multipartFile) {
+        userDto.setPwd(bCryptPasswordEncoder.encode(userDto.getPwd()));
         User user = userDto.userDtoToEntity();
+
         S3UploadDto s3UploadDto;
 
         if (multipartFile != null) {
@@ -46,12 +46,12 @@ public class UserServiceImpl implements UserService {
 
                 User.builder()
                         .email(userDto.getEmail())
-                        .pwd(userDto.getPwd())
+                        .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
                         .nickname(userDto.getNickname())
                         .role(userDto.getRole())
                         .phone(userDto.getPhone())
                         .gender(userDto.getGender())
-                        .isNoteReject(user.isNoteReject())
+                        .isNoteReject(userDto.isNoteReject())
                         .profileImgPath(s3UploadDto.getImgUrl())
                         .saveName(s3UploadDto.getSaveName())
                         .originName(s3UploadDto.getOriginName())
@@ -200,16 +200,16 @@ public class UserServiceImpl implements UserService {
         return userResponses;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, InformationDismatchException {
-        User user = userRepository.findByEmail(username);
-
-        if (user == null) {
-            throw new InformationDismatchException();
-        }
-
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPwd(),
-                true, true, true, true,
-                new ArrayList<>());
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, InformationDismatchException {
+//        User user = userRepository.findByEmail(username);
+//
+//        if (user == null) {
+//            throw new InformationDismatchException();
+//        }
+//
+//        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPwd(),
+//                true, true, true, true,
+//                new ArrayList<>());
+//    }
 }

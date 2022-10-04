@@ -2,10 +2,8 @@ package com.nanum.userservice.user.dto;
 
 import com.nanum.config.Role;
 import com.nanum.userservice.user.domain.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
 @Data
@@ -13,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
+
     private Long userId;
     private String email;
     private String pwd;

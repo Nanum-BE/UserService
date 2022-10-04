@@ -48,6 +48,7 @@ import java.util.List;
         @ApiResponse(responseCode = "500", description = "server error",
                 content = @Content(schema = @Schema(implementation = BaseResponse.class))),
 })
+
 public class UserController {
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     private final UserService userService;
