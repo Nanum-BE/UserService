@@ -7,7 +7,7 @@ spring:
       max-file-size: 50MB
       max-request-size: 500MB
   profiles:
-    include: local
+    include: prod
   redis:
     lettuce:
       pool:
