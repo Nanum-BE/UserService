@@ -1,5 +1,7 @@
 package com.nanum.utils.sms.application;
 
+import com.nanum.exception.UserAlreadyExistException;
+import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.utils.sms.presentation.PhoneAuthServiceImpl;
 import com.nanum.utils.sms.vo.RequestSMS;
 import com.nanum.utils.sms.vo.ResponseSMS;
@@ -18,7 +20,10 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @CrossOrigin
 public class PhoneAuthController {
+
     private final PhoneAuthServiceImpl phoneAuthServiceImpl;
+    private final UserRepository userRepository;
+
     @Operation(summary = "문자 인증 api", description = "입력받은 번호로 인증번호 요청")
     @PostMapping("/v1/sms/sends")
     public ResponseEntity<ResponseSMS> createMessage(@RequestBody RequestSMS requestSMS) {
@@ -30,6 +35,10 @@ public class PhoneAuthController {
     @Operation(summary = "인증번호 확인 api", description = "인증번호를 제대로 입력했는지 확인")
     @PostMapping("/v1/sms/confirm")
     public ResponseEntity<String> ConfirmMessage(@RequestBody RequestSMS requestSMS) {
+        if (userRepository.existsByPhone(requestSMS.getPhoneNumber())){
+            throw new UserAlreadyExistException();
+        }
+
         String message = phoneAuthServiceImpl.confirmMessage(requestSMS);
         String value;
 

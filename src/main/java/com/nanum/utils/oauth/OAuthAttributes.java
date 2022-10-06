@@ -17,6 +17,7 @@ import java.util.Map;
 @Getter
 public class OAuthAttributes {
     private Map<String, Object> attributes;
+    private OAuthProvider oAuthProvider;
     private String nameAttributeKey;
     private String nickname;
     private String mobile;
@@ -51,6 +52,10 @@ public class OAuthAttributes {
     private static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
+        log.info("-------------");
+        log.info(userNameAttributeName);
+        log.info(String.valueOf(attributes));
+
         return OAuthAttributes.builder()
                 .email(String.valueOf(response.get("email")))
                 .mobile(String.valueOf(response.get("mobile")))
@@ -64,8 +69,7 @@ public class OAuthAttributes {
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> kakao_account = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakao_profile = (Map<String, Object>) kakao_account.get("profile");
-        log.info(String.valueOf(kakao_account));
-        log.info(String.valueOf(kakao_profile));
+;
         return OAuthAttributes.builder()
                 .email(String.valueOf(kakao_account.get("email")))
                 .nickname(String.valueOf(kakao_profile.get("nickname")))

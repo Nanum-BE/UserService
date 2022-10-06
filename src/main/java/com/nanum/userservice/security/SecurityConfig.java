@@ -40,6 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 .antMatchers("/actuator/**").permitAll()
+//                .antMatchers("/login").permitAll()
                 .antMatchers("/**").permitAll()
                 .and()
                 .addFilterBefore(corsConfig.corsFilter(),

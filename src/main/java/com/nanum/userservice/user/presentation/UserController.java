@@ -64,13 +64,17 @@ public class UserController {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         UserDto userDto = mapper.map(userRequest, UserDto.class);
-
         String result = "회원가입이 완료되었습니다";
         BaseResponse<String> response = new BaseResponse<>(result);
 
-        if (multipartFile!=null) {
+        log.info("---------------------");
+
+        //null인 상태는 아예 value를 넣지 않았을 경우고 isEmpty는 value에 넣긴했는데 사진을 선택하지 않았을 경우
+        if (multipartFile!=null && !multipartFile.isEmpty()) {
             userService.createUser(userDto, multipartFile);
         } else {
+            log.info("***********");
+
             userService.createUser(userDto, null);
         }
 

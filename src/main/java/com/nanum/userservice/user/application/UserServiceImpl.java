@@ -1,5 +1,6 @@
 package com.nanum.userservice.user.application;
 
+import com.nanum.config.Role;
 import com.nanum.exception.ProfileImgNotFoundException;
 import com.nanum.exception.UserNotFoundException;
 import com.nanum.userservice.user.domain.User;
@@ -8,17 +9,25 @@ import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.userservice.user.vo.ModifyPasswordRequest;
 import com.nanum.userservice.user.vo.UserModifyRequest;
 import com.nanum.userservice.user.vo.UserResponse;
+import com.nanum.utils.jwt.JwtTokenProvider;
+import com.nanum.utils.oauth.vo.OAuthUserRequest;
 import com.nanum.utils.s3.S3UploaderService;
 import com.nanum.utils.s3.dto.S3UploadDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +36,12 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final S3UploaderService s3UploaderService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public void createUser(UserDto userDto, MultipartFile multipartFile) {
@@ -133,6 +143,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User signOAuthUser(OAuthUserRequest userRequest) {
+
+        User user = userRepository.save(User.builder()
+                .email(userRequest.getEmail())
+                .gender(userRequest.getGender())
+                .role(Role.USER)
+                .nickname(userRequest.getNickname())
+                .socialType(userRequest.getSocialType())
+                .phone(userRequest.getPhone())
+                .pwd(bCryptPasswordEncoder.encode("1"))
+                .build());
+
+        return user;
+    }
+
+    @Override
     public List<UserResponse> retrieveAllUsers() {
         List<User> userEntities = userRepository.findAll();
 
@@ -158,8 +184,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse retrieveUser(Long userId) {
 
         Optional<User> userEntity = userRepository.findById(userId);
-        if(userEntity.isEmpty()){
-            throw new UserNotFoundException(String.format("ID[%s] not found",userId));
+        if (userEntity.isEmpty()) {
+            throw new UserNotFoundException(String.format("ID[%s] not found", userId));
         }
 //        User user = userRepository.findById(userId).get();
         User user = userEntity.get();
@@ -178,7 +204,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> retrieveUsersByUserIds(List Longs) {
         List<User> users = userRepository.findAllById(Longs);
-        if(users.size()<1){
+        if (users.size() < 1) {
             throw new UserNotFoundException(String.format("users[%s] not found", Longs));
         }
 
@@ -200,16 +226,11 @@ public class UserServiceImpl implements UserService {
         return userResponses;
     }
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, InformationDismatchException {
-//        User user = userRepository.findByEmail(username);
-//
-//        if (user == null) {
-//            throw new InformationDismatchException();
-//        }
-//
-//        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPwd(),
-//                true, true, true, true,
-//                new ArrayList<>());
-//    }
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        Authentication authentication)
+            throws IOException, ServletException {
+
+    }
 }

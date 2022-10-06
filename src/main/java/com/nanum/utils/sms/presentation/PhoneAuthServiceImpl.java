@@ -6,7 +6,7 @@ import com.nanum.utils.sms.dto.MessageDto;
 import com.nanum.utils.sms.dto.MessageDtoReq;
 import com.nanum.utils.sms.vo.RequestSMS;
 import com.nanum.utils.sms.vo.ResponseSMS;
-import com.nanum.utils.sms.vo.SmsCertification;
+import com.nanum.utils.sms.vo.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -34,7 +34,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class PhoneAuthServiceImpl implements PhoneAuthService {
     private final Environment env;
-    private final SmsCertification smsCertification;
+    private final RedisService redisService;
 
     //    @Value("${sms.serviceId}")
     private String serviceId;
@@ -143,7 +143,7 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
             throw new Exception(e.getMessage());
         }
 
-        smsCertification.createSmsCertification(tel, rand);
+        redisService.createSmsCertification(tel, rand);
 
         return smsAuthDtoRes;
     }
@@ -153,15 +153,15 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
         if (isVerify(requestSMS)) {
             success = "fail";
         } else {
-            smsCertification.removeSmsCertification(requestSMS.getPhoneNumber());
+            redisService.removeSmsCertification(requestSMS.getPhoneNumber());
             success = "ok";
         }
         return success;
     }
 
     private boolean isVerify(RequestSMS requestDto) {
-        return !(smsCertification.hasKey(requestDto.getPhoneNumber()) &&
-                smsCertification.getSmsCertification(requestDto.getPhoneNumber())
+        return !(redisService.hasKey(requestDto.getPhoneNumber()) &&
+                redisService.getSmsCertification(requestDto.getPhoneNumber())
                         .equals(requestDto.getContent()));
     }
 

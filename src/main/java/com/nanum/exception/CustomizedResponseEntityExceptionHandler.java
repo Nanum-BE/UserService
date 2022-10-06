@@ -35,6 +35,15 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity<>(exceptionResponse, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<Object> handleUserAlreadyExistException(Exception ex, WebRequest request) {
+        ExceptionResponse exceptionResponse =
+                new ExceptionResponse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분 ss초")),
+                        ex.getMessage(), request.getDescription(false));
+
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(PasswordDismatchException.class)
     public ResponseEntity<Object> handlePasswordDismatchException(Exception ex, WebRequest request) {
         ExceptionResponse exceptionResponse =
