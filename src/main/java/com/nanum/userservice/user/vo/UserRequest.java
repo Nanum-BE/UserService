@@ -25,7 +25,7 @@ public class UserRequest {
     private String pwd;
 
     @NotNull(message = "Nickname cannot be null")
-    @Schema(description = "사용자 닉네임", defaultValue = "아무거나 적어줘여")
+    @Schema(description = "사용자 닉네임", defaultValue = "별명")
     @Size(min = 1,message = "Nickname must be not be less than two characters")
     private String nickname;
 
@@ -39,8 +39,8 @@ public class UserRequest {
     private String phone;
 
     @NotNull
-    @Schema(description = "사용자 성별", defaultValue = "1")
-    @Comment("0번은 여자, 1번은 남자로 구분해서 나눈다")
+    @Schema(description = "사용자 성별", defaultValue = "M")
+    @Comment("남자는 M, 여자는 F로")
     private String gender;
 
     @NotNull

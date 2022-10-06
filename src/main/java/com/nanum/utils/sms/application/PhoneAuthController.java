@@ -1,11 +1,17 @@
 package com.nanum.utils.sms.application;
 
+import com.nanum.config.BaseResponse;
 import com.nanum.exception.UserAlreadyExistException;
 import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.utils.sms.presentation.PhoneAuthServiceImpl;
+import com.nanum.utils.sms.vo.ConfirmSMS;
 import com.nanum.utils.sms.vo.RequestSMS;
 import com.nanum.utils.sms.vo.ResponseSMS;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,10 +21,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @RestController
-@Tag(name = "사용자", description = "사용자 관련 api")
+@Tag(name = "사용자", description = "사용자 문자인증과 관련한 api")
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @CrossOrigin
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "success",
+                content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "201", description = "created successfully",
+                content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "400", description = "bad request",
+                content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "500", description = "server error",
+                content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+})
 public class PhoneAuthController {
 
     private final PhoneAuthServiceImpl phoneAuthServiceImpl;
@@ -34,7 +50,7 @@ public class PhoneAuthController {
 
     @Operation(summary = "인증번호 확인 api", description = "인증번호를 제대로 입력했는지 확인")
     @PostMapping("/v1/sms/confirm")
-    public ResponseEntity<String> ConfirmMessage(@RequestBody RequestSMS requestSMS) {
+    public ResponseEntity<String> ConfirmMessage(@RequestBody ConfirmSMS requestSMS) {
         if (userRepository.existsByPhone(requestSMS.getPhoneNumber())){
             throw new UserAlreadyExistException();
         }

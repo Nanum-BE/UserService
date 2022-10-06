@@ -3,6 +3,7 @@ package com.nanum.userservice.user.presentation;
 import com.nanum.config.BaseResponse;
 import com.nanum.exception.DuplicateEmailException;
 import com.nanum.exception.DuplicateNickNameException;
+import com.nanum.exception.ExceptionResponse;
 import com.nanum.exception.PasswordDismatchException;
 import com.nanum.userservice.user.application.UserService;
 import com.nanum.userservice.user.domain.User;
@@ -44,9 +45,11 @@ import java.util.List;
         @ApiResponse(responseCode = "201", description = "created successfully",
                 content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "400", description = "bad request",
-                content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+                content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
+        @ApiResponse(responseCode = "409", description = "conflict",
+                content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
         @ApiResponse(responseCode = "500", description = "server error",
-                content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+                content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
 })
 
 public class UserController {
@@ -70,7 +73,7 @@ public class UserController {
         log.info("---------------------");
 
         //null인 상태는 아예 value를 넣지 않았을 경우고 isEmpty는 value에 넣긴했는데 사진을 선택하지 않았을 경우
-        if (multipartFile!=null && !multipartFile.isEmpty()) {
+        if (multipartFile != null && !multipartFile.isEmpty()) {
             userService.createUser(userDto, multipartFile);
         } else {
             log.info("***********");
@@ -156,7 +159,7 @@ public class UserController {
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경하기 위한 요청")
     @PutMapping("/users/{userId}/pw")
     public ResponseEntity<BaseResponse<String>> modifyUserPassword(@PathVariable Long userId,
-                                                     @RequestBody ModifyPasswordRequest passwordRequest) {
+                                                                   @RequestBody ModifyPasswordRequest passwordRequest) {
         userService.modifyUserPw(userId, passwordRequest);
 
         String result = "비밀번호 변경이 완료되었습니다";
@@ -167,8 +170,8 @@ public class UserController {
 
     @Operation(summary = "특정 전체 사용자 조회 api", description = "특정 모든 사용자들의 정보를 조회하기 위한 요청(ps id가 2이상일때만 사용가능)")
     @GetMapping("/users/particular")
-    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveUsersById(@RequestParam(value="param", required=false, defaultValue="")
-                                                                                  List<Long> params) {
+    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveUsersById(@RequestParam(value = "param", required = false, defaultValue = "")
+                                                                                      List<Long> params) {
 
         List<UserResponse> userResponses = userService.retrieveUsersByUserIds(params);
         BaseResponse<List<UserResponse>> responses = new BaseResponse<>(userResponses);

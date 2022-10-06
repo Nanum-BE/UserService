@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nanum.utils.sms.dto.MessageDto;
 import com.nanum.utils.sms.dto.MessageDtoReq;
+import com.nanum.utils.sms.vo.ConfirmSMS;
 import com.nanum.utils.sms.vo.RequestSMS;
 import com.nanum.utils.sms.vo.ResponseSMS;
 import com.nanum.utils.sms.vo.RedisService;
@@ -148,7 +149,7 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
         return smsAuthDtoRes;
     }
 
-    public String confirmMessage(RequestSMS requestSMS) {
+    public String confirmMessage(ConfirmSMS requestSMS) {
         String success;
         if (isVerify(requestSMS)) {
             success = "fail";
@@ -159,7 +160,7 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
         return success;
     }
 
-    private boolean isVerify(RequestSMS requestDto) {
+    private boolean isVerify(ConfirmSMS requestDto) {
         return !(redisService.hasKey(requestDto.getPhoneNumber()) &&
                 redisService.getSmsCertification(requestDto.getPhoneNumber())
                         .equals(requestDto.getContent()));

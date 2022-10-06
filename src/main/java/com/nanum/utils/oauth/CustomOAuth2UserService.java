@@ -1,18 +1,10 @@
-package com.nanum.userservice.user.application;
+package com.nanum.utils.oauth;
 
-import com.nanum.exception.UserAlreadyExistException;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.infrastructure.UserRepository;
-import com.nanum.utils.jwt.JwtTokenProvider;
-import com.nanum.utils.oauth.OAuthAttributes;
 import com.nanum.utils.sms.vo.RedisService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.websocket.AuthenticationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +17,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Date;
 
 @Slf4j
 @Service
@@ -70,16 +61,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     public User createSocialUser(OAuthAttributes attributes, String socialType) {
 
         log.info(env.getProperty("token.expiration_time"));
-        User user;
+        User user = null;
 
         if (!userRepository.existsByEmail(attributes.getEmail())) {
-//            user = userRepository.save(attributes.toEntity(socialType));
             user = redisService.createTemporalOAuthUser(attributes.getEmail(),
                     attributes.getNickname(),
                     attributes,
                     socialType);
-        } else {
-            throw new UserAlreadyExistException();
         }
         return user;
     }
