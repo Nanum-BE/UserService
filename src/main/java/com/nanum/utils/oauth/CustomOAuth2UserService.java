@@ -61,14 +61,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     public User createSocialUser(OAuthAttributes attributes, String socialType) {
 
         log.info(env.getProperty("token.expiration_time"));
-        User user = null;
 
-        if (!userRepository.existsByEmail(attributes.getEmail())) {
-            user = redisService.createTemporalOAuthUser(attributes.getEmail(),
-                    attributes.getNickname(),
-                    attributes,
-                    socialType);
+
+        if (userRepository.existsByEmail(attributes.getEmail())) {
+            User byEmail = userRepository.findByEmail(attributes.getEmail());
         }
-        return user;
+        return redisService.createTemporalOAuthUser(attributes.getEmail(),
+                attributes.getNickname(),
+                attributes,
+                socialType);
     }
 }

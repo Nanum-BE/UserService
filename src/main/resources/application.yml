@@ -15,7 +15,8 @@ spring:
         max-idle: 10
         min-idle: 2
     port: 6379
-    host: 127.0.0.1
+#    host: 127.0.0.1
+    host: 20.214.170.222
     password: 1234
   application:
     name: user-service
