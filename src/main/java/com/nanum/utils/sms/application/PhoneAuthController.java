@@ -24,7 +24,7 @@ import java.util.Objects;
 @Tag(name = "사용자", description = "사용자 문자인증과 관련한 api")
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "success",
                 content = @Content(schema = @Schema(implementation = BaseResponse.class))),

@@ -1,6 +1,7 @@
 package com.nanum.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @RequiredArgsConstructor
 @Configuration
+@Slf4j
 @ConfigurationProperties(prefix = "spring.redis")
 public class RedisConfig {
     private final Environment env;
@@ -29,6 +31,12 @@ public class RedisConfig {
         this.redisHost = env.getProperty("spring.redis.host");
         this.redisPort = env.getProperty("spring.redis.port");
         this.redisPassword = env.getProperty("spring.redis.password");
+
+        log.info(env.getProperty("spring.redis.host"));
+        log.info(env.getProperty("spring.redis.port"));
+        log.info(redisHost);
+        log.info(redisPort);
+
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(redisHost);
         redisStandaloneConfiguration.setPort(Integer.parseInt(redisPort));

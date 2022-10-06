@@ -38,7 +38,7 @@ import java.util.List;
 @Tag(name = "사용자", description = "사용자 관련 api")
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "success",
                 content = @Content(schema = @Schema(implementation = BaseResponse.class))),

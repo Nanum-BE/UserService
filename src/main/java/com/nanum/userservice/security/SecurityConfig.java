@@ -20,11 +20,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Configuration
 @Slf4j
 @EnableWebSecurity
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -40,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 .antMatchers("/actuator/**").permitAll()
-//                .antMatchers("/login").permitAll()
+                .antMatchers("/login").permitAll()
                 .antMatchers("/**").permitAll()
                 .and()
                 .addFilterBefore(corsConfig.corsFilter(),

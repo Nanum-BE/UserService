@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "소셜로그인", description = "소셜로그인 추가 정보 입력받은 후 회원가입 시키기 위한 api")
