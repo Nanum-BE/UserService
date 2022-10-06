@@ -54,6 +54,10 @@ dependencies {
 
 }
 
+dependencies {
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"

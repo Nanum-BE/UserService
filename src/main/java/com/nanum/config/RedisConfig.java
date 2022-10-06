@@ -1,28 +1,34 @@
 package com.nanum.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+@RequiredArgsConstructor
 @Configuration
 @ConfigurationProperties(prefix = "spring.redis")
 public class RedisConfig {
-
-    @Value("${spring.redis.host}")
+    private final Environment env;
+    //    @Value("${spring.redis.host}")
     private String redisHost;
-    @Value("${spring.redis.port}")
+    //    @Value("${spring.redis.port}")
     private String redisPort;
-    @Value("${spring.redis.password}")
+    //    @Value("${spring.redis.password}")
     private String redisPassword;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
+        this.redisHost = env.getProperty("spring.redis.host");
+        this.redisPort = env.getProperty("spring.redis.port");
+        this.redisPassword = env.getProperty("spring.redis.password");
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(redisHost);
         redisStandaloneConfiguration.setPort(Integer.parseInt(redisPort));
