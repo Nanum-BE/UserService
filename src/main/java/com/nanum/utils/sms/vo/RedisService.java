@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 
-@EnableRedisRepositories
+@Repository
 @RequiredArgsConstructor
 @Slf4j
 public class RedisService {
