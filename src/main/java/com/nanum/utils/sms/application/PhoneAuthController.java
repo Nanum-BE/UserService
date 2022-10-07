@@ -51,19 +51,23 @@ public class PhoneAuthController {
     @Operation(summary = "인증번호 확인 api", description = "인증번호를 제대로 입력했는지 확인")
     @PostMapping("/v1/sms/confirm")
     public ResponseEntity<String> ConfirmMessage(@RequestBody ConfirmSMS requestSMS) {
-        if (userRepository.existsByPhone(requestSMS.getPhoneNumber())){
+
+        if (userRepository.existsByPhone(requestSMS.getPhoneNumber())) {
             throw new UserAlreadyExistException();
         }
 
+        ResponseEntity<String> body;
         String message = phoneAuthServiceImpl.confirmMessage(requestSMS);
         String value;
 
         if (Objects.equals(message, "ok")) {
             value = "인증번호 확인되었습니다";
+            body = ResponseEntity.status(HttpStatus.OK).body(value);
         } else {
             value = "인증번호를 다시 확인해주세요";
+            body = ResponseEntity.status(HttpStatus.NO_CONTENT).body(value);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(value);
+        return body;
     }
 }

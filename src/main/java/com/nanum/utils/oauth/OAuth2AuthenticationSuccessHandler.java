@@ -26,6 +26,8 @@ import java.util.Map;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final ObjectMapper mapper;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -38,10 +40,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Map<String, Object> kakao_account = null;
         String email;
         String socialType = null;
+
         log.info(String.valueOf(authentication));
         log.info(String.valueOf(authentication.getPrincipal()));
         log.info(String.valueOf(oAuth2User.getAttributes()));
         log.info(String.valueOf(authentication.getDetails()));
+
+
         if (oAuth2User.getAttributes().containsKey("kakao_account")) {
             socialType = "kakao";
             kakao_account = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
@@ -50,6 +55,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             email = String.valueOf(oAuth2User.getAttributes().get("email"));
         }
 
+        User user = userRepository.findByEmail(email);
+
+        if (userRepository.existsByEmail(email)) {
+            String socialToken = jwtTokenProvider.createSocialToken(user.getId());
+            String url = makeRedirectUrl(socialToken);
+            response.addHeader("Authorization", socialToken);
+            getRedirectStrategy().sendRedirect(request, response, url);
+        }
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
@@ -70,7 +83,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String makeRedirectUrl(String token) {
-        return UriComponentsBuilder.fromUriString("http://13.209.26.150:9000/comm-users/social/" + token)
+        return UriComponentsBuilder.fromUriString("http://localhost:9091/login/oauth2/code/kakao" + token)
                 .build().toUriString();
     }
 
