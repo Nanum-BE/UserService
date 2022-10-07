@@ -64,7 +64,7 @@ public class PhoneAuthController {
             value = "인증번호 확인되었습니다";
             body = ResponseEntity.status(HttpStatus.OK).body(value);
         } else {
-            value = "인증번호를 다시 확인해주세요";
+            value = "인증번호를 다시 확인해주세요!!";
             body = ResponseEntity.status(HttpStatus.NO_CONTENT).body(value);
         }
 
