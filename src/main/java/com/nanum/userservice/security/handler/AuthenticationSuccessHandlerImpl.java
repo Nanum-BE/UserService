@@ -46,7 +46,9 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
         response.addHeader("userId", String.valueOf(user.getId()));
 
         Map<String, String> tokenDto = new HashMap<>();
+
         tokenDto.put("accessToken", token);
+        tokenDto.put("userId", String.valueOf(user.getId()));
 
         BaseResponse<Map<String, String>> baseResponse = new BaseResponse<>(tokenDto);
 
