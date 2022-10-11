@@ -70,17 +70,23 @@ public class UserController {
         String result = "회원가입이 완료되었습니다";
         BaseResponse<String> response = new BaseResponse<>(result);
 
-        log.info("---------------------");
-
+        Boolean user = null;
         //null인 상태는 아예 value를 넣지 않았을 경우고 isEmpty는 value에 넣긴했는데 사진을 선택하지 않았을 경우
         if (multipartFile != null && !multipartFile.isEmpty()) {
-            userService.createUser(userDto, multipartFile);
+            log.info("12121212");
+            user = userService.createUser(userDto, multipartFile);
         } else {
+            log.info(multipartFile.toString());
             log.info("***********");
 
             userService.createUser(userDto, null);
         }
 
+        String signFail = "다시 확인해주세요!";
+
+        if (Boolean.FALSE.equals(user)) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(signFail);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

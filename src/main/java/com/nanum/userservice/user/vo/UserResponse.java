@@ -16,6 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
+
+    @Schema(description = "사용자 식별 id")
+    private Long id;
+
     @Schema(description = "사용자 이메일", defaultValue = "spharos@gmail.com")
     private String email;
 

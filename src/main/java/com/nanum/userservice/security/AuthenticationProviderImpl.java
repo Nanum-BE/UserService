@@ -41,10 +41,15 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         User userEmail = userRepository.findByEmail(username);
         userDetail = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
 
+        log.info(password);
+        log.info(userEmail.getPwd());
+        log.info(bCryptPasswordEncoder.encode("123456789"));
         if (!bCryptPasswordEncoder.matches(password, userEmail.getPwd())) {
+            log.info("----");
             throw new InformationDismatchException();
         }
 
+        log.info("----");
         return new UsernamePasswordAuthenticationToken(userDetail.getUsername(), "", userDetail.getAuthorities());
     }
 

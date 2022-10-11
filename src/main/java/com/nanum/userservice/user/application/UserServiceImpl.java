@@ -44,17 +44,17 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public void createUser(UserDto userDto, MultipartFile multipartFile) {
-        userDto.setPwd(bCryptPasswordEncoder.encode(userDto.getPwd()));
-        User user = userDto.userDtoToEntity();
-
+    public boolean createUser(UserDto userDto, MultipartFile multipartFile) {
         S3UploadDto s3UploadDto;
 
         if (multipartFile != null) {
             try {
                 s3UploadDto = s3UploaderService.upload(multipartFile, "myspharosbucket", "userProfile");
 
-                User.builder()
+                log.info(s3UploadDto.getImgUrl());
+                log.info(s3UploadDto.getOriginName());
+
+                User newUser = User.builder()
                         .email(userDto.getEmail())
                         .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
                         .nickname(userDto.getNickname())
@@ -67,12 +67,21 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
                         .originName(s3UploadDto.getOriginName())
                         .build();
 
+                userRepository.save(newUser);
+
+                log.info(userDto.getPwd());
+                log.info(bCryptPasswordEncoder.encode(userDto.getPwd()));
+                log.info(newUser.getPwd());
             } catch (IOException e) {
                 throw new ProfileImgNotFoundException();
             }
+        } else {
+            userDto.setPwd(bCryptPasswordEncoder.encode(userDto.getPwd()));
+            User user = userDto.userDtoToEntity();
+            userRepository.save(user);
         }
 
-        userRepository.save(user);
+        return true;
     }
 
     @Override
@@ -169,6 +178,7 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
 
         userEntities.forEach(user -> {
             userResponses.add(UserResponse.builder()
+                    .id(user.getId())
                     .email(user.getEmail())
                     .nickName(user.getNickname())
                     .phone(user.getPhone())
@@ -194,6 +204,7 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
         User user = userEntity.get();
 
         return UserResponse.builder()
+                .id(user.getId())
                 .email(user.getEmail())
                 .nickName(user.getNickname())
                 .phone(user.getPhone())
@@ -215,6 +226,7 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
 
         users.forEach(user -> {
             userResponses.add(UserResponse.builder()
+                    .id(user.getId())
                     .email(user.getEmail())
                     .nickName(user.getNickname())
                     .phone(user.getPhone())

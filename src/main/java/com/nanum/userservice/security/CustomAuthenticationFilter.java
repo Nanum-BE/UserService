@@ -30,7 +30,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, InformationDismatchException {
+            throws AuthenticationException {
         final UsernamePasswordAuthenticationToken authRequest;
 
         final UserLoginDto userLoginDto;
