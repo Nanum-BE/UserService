@@ -51,9 +51,6 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
             try {
                 s3UploadDto = s3UploaderService.upload(multipartFile, "myspharosbucket", "userProfile");
 
-                log.info(s3UploadDto.getImgUrl());
-                log.info(s3UploadDto.getOriginName());
-
                 User newUser = User.builder()
                         .email(userDto.getEmail())
                         .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
@@ -69,9 +66,6 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
 
                 userRepository.save(newUser);
 
-                log.info(userDto.getPwd());
-                log.info(bCryptPasswordEncoder.encode(userDto.getPwd()));
-                log.info(newUser.getPwd());
             } catch (IOException e) {
                 throw new ProfileImgNotFoundException();
             }
@@ -100,19 +94,48 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        S3UploadDto s3UploadDto;
 
-        userRepository.save(User.builder()
-                .id(userId)
-                .email(user.getEmail())
-                .role(user.getRole())
-                .loginFailCnt(user.getLoginFailCnt())
-                .warnCnt(user.getWarnCnt())
-                .nickname(request.getNickname())
-                .phone(request.getPhone())
-                .pwd(user.getPwd())
-                .isNoteReject(request.isNoteReject())
-                .gender(request.getGender())
-                .build());
+        if (file != null) {
+            try {
+                s3UploadDto = s3UploaderService.upload(file, "myspharosbucket", "userProfile");
+
+                userRepository.save(User.builder()
+                        .id(userId)
+                        .email(user.getEmail())
+                        .role(user.getRole())
+                        .loginFailCnt(user.getLoginFailCnt())
+                        .warnCnt(user.getWarnCnt())
+                        .nickname(request.getNickname())
+                        .phone(request.getPhone())
+                        .profileImgPath(s3UploadDto.getImgUrl())
+                        .saveName(s3UploadDto.getSaveName())
+                        .originName(s3UploadDto.getOriginName())
+                        .pwd(user.getPwd())
+                        .isNoteReject(request.isNoteReject())
+                        .gender(request.getGender())
+                        .build());
+
+            } catch (IOException e) {
+                throw new ProfileImgNotFoundException();
+            }
+        } else
+
+            userRepository.save(User.builder()
+                    .id(userId)
+                    .email(user.getEmail())
+                    .role(user.getRole())
+                    .loginFailCnt(user.getLoginFailCnt())
+                    .warnCnt(user.getWarnCnt())
+                    .nickname(request.getNickname())
+                    .phone(request.getPhone())
+                    .profileImgPath(request.getImgUrl())
+                    .saveName(user.getSaveName())
+                    .originName(user.getOriginName())
+                    .pwd(user.getPwd())
+                    .isNoteReject(request.isNoteReject())
+                    .gender(request.getGender())
+                    .build());
     }
 
     @Override
@@ -197,6 +220,7 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     public UserResponse retrieveUser(Long userId) {
 
         Optional<User> userEntity = userRepository.findById(userId);
+
         if (userEntity.isEmpty()) {
             throw new UserNotFoundException(String.format("ID[%s] not found", userId));
         }

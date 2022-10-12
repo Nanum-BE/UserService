@@ -29,7 +29,7 @@ public class UserModifyRequest {
 
     @NotNull
     @Schema(description = "사용자 성별", defaultValue = "1")
-    @Comment("0번은 여자, 1번은 남자로 구분해서 나눈다")
+    @Comment("0번은 여자, 1번은 남자로 구분`해서 나눈다")
     private String gender;
     
     //TODO 쪽지수신여부가 true, false가 안바뀜
@@ -37,4 +37,8 @@ public class UserModifyRequest {
     @Schema(description = "쪽지수신 허용 여부", defaultValue = "false")
     @Comment("true false로 쪽지 수신 허용 여부를 나눈다")
     private boolean isNoteReject;
+
+    @Schema(description = "프로필 이미지 url")
+    @Comment("사용자 프로필 이미지")
+    private String imgUrl;
 }

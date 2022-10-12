@@ -125,17 +125,19 @@ public class UserController {
 
     @Operation(summary = "특정 사용자 정보 조회 api", description = "조회하고자 하는 특정 사용자의 정보 요청")
     @GetMapping("/users/{userId}")
-    public ResponseEntity<BaseResponse<UserResponse>> retrieveUser(@PathVariable Long userId) {
+    public UserResponse retrieveUser(@PathVariable Long userId) {
         UserResponse response = userService.retrieveUser(userId);
         BaseResponse<UserResponse> responses = new BaseResponse<>(response);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responses);
+        System.err.println("response : " + response);
+        System.err.println(responses);
+//        return ResponseEntity.status(HttpStatus.OK).body(responses);
+        return response;
     }
 
     @Operation(summary = "사용자 정보수정", description = "수정된 정보로 다시 사용자 정보 수정하는 요청")
     @PutMapping("/users/{userId}")
     public ResponseEntity<BaseResponse<String>> modifyUser(@PathVariable Long userId,
-                                                           @RequestBody UserModifyRequest request,
+                                                           @RequestPart UserModifyRequest request,
                                                            @RequestPart(value = "profileImg", required = false)
                                                                    MultipartFile file) {
         userService.modifyUser(userId, request, file);
@@ -176,8 +178,8 @@ public class UserController {
 
     @Operation(summary = "특정 전체 사용자 조회 api", description = "특정 모든 사용자들의 정보를 조회하기 위한 요청(ps id가 2이상일때만 사용가능)")
     @GetMapping("/users/particular")
-    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveUsersById(@RequestParam(value = "param", required = false, defaultValue = "")
-                                                                                      List<Long> params) {
+    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveUsersById(@RequestParam(value = "param",
+            required = false, defaultValue = "") List<Long> params) {
 
         List<UserResponse> userResponses = userService.retrieveUsersByUserIds(params);
         BaseResponse<List<UserResponse>> responses = new BaseResponse<>(userResponses);
