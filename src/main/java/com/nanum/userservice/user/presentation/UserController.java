@@ -125,13 +125,21 @@ public class UserController {
 
     @Operation(summary = "특정 사용자 정보 조회 api", description = "조회하고자 하는 특정 사용자의 정보 요청")
     @GetMapping("/users/{userId}")
-    public UserResponse retrieveUser(@PathVariable Long userId) {
+    public ResponseEntity<BaseResponse<UserResponse>> retrieveUser(@PathVariable Long userId) {
+
+        log.info(String.valueOf(userId));
         UserResponse response = userService.retrieveUser(userId);
-        BaseResponse<UserResponse> responses = new BaseResponse<>(response);
-        System.err.println("response : " + response);
-        System.err.println(responses);
-//        return ResponseEntity.status(HttpStatus.OK).body(responses);
-        return response;
+
+        log.info(response.getEmail());
+
+        BaseResponse<UserResponse> baseResponse = new BaseResponse<>(response);
+        return ResponseEntity.status(HttpStatus.OK).body(baseResponse);
+    }
+
+    @GetMapping("/users/email/{email}")
+    public UserResponse retrieveUsers(@PathVariable String email) {
+        log.info(email);
+        return userService.retrieveUsers(email);
     }
 
     @Operation(summary = "사용자 정보수정", description = "수정된 정보로 다시 사용자 정보 수정하는 요청")

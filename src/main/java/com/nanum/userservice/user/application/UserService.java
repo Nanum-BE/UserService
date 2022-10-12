@@ -31,6 +31,8 @@ public interface UserService {
 
     UserResponse retrieveUser(Long userId);
 
+    UserResponse retrieveUsers(String email);
+
     // 박
     List<UserResponse> retrieveUsersByUserIds(List Longs);
 

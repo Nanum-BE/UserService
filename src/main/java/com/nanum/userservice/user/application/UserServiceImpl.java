@@ -240,6 +240,21 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     }
 
     @Override
+    public UserResponse retrieveUsers(String email) {
+        User user = userRepository.findByEmail(email);
+        return UserResponse.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .isNoteReject(user.isNoteReject())
+                .profileImgUrl(user.getProfileImgPath())
+                .nickName(user.getNickname())
+                .gender(user.getGender())
+                .createAt(user.getCreateAt())
+                .build();
+    }
+
+    @Override
     public List<UserResponse> retrieveUsersByUserIds(List Longs) {
         List<User> users = userRepository.findAllById(Longs);
         if (users.size() < 1) {
