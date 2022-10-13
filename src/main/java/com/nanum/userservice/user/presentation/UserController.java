@@ -26,6 +26,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -187,5 +189,17 @@ public class UserController {
         List<UsersResponse> userResponses = userService.retrieveUsersByUserIds(params);
         BaseResponse<List<UsersResponse>> responses = new BaseResponse<>(userResponses);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
+    @Operation(summary = "특정 전체 사용자 조회 api", description = "특정 모든 사용자들의 정보를 조회하기 위한 요청(ps id가 2이상일때만 사용가능)")
+    @GetMapping("/users/particular/mono")
+    public Mono<ResponseEntity<BaseResponse<List<UsersResponse>>>> retrieveUsersByIdMono(@RequestParam(value = "param",
+            required = false, defaultValue = "") List<Long> params) {
+
+        List<UsersResponse> userResponses = userService.retrieveUsersByUserIds(params);
+        BaseResponse<List<UsersResponse>> responses = new BaseResponse<>(userResponses);
+        Mono.just(responses);
+        return Mono.just(responses)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }

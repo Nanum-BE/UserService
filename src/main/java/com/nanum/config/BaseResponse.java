@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @JsonPropertyOrder({"isSuccess", "message", "error", "result"})
-public class BaseResponse<T> {
+public class BaseResponse<T>{
 
     @JsonProperty("isSuccess")
     private final Boolean isSuccess;
