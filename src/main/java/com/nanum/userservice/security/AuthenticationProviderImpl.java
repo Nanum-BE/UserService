@@ -36,6 +36,8 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         String username = token.getName();
         String password = (String) token.getCredentials();
 
+        log.info("authentication:{}", username);
+
         UserDetailsImpl userDetail;
 
         User userEmail = userRepository.findByEmail(username);
