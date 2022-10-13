@@ -33,7 +33,7 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication)
-            throws IOException, ServletException {
+            throws IOException {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = userRepository.findByEmail(String.valueOf(authentication.getPrincipal()));
@@ -44,11 +44,13 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
         response.setCharacterEncoding("UTF-8");
         response.addHeader("token", token);
         response.addHeader("userId", String.valueOf(user.getId()));
+        response.addHeader("role", String.valueOf(user.getRole()));
 
         Map<String, String> tokenDto = new HashMap<>();
 
         tokenDto.put("accessToken", token);
         tokenDto.put("userId", String.valueOf(user.getId()));
+        tokenDto.put("role", String.valueOf(user.getRole()));
 
         BaseResponse<Map<String, String>> baseResponse = new BaseResponse<>(tokenDto);
 
