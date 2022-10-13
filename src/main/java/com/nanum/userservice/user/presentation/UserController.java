@@ -9,10 +9,7 @@ import com.nanum.userservice.user.application.UserService;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
-import com.nanum.userservice.user.vo.ModifyPasswordRequest;
-import com.nanum.userservice.user.vo.UserModifyRequest;
-import com.nanum.userservice.user.vo.UserRequest;
-import com.nanum.userservice.user.vo.UserResponse;
+import com.nanum.userservice.user.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -117,9 +114,9 @@ public class UserController {
 
     @Operation(summary = "전체 사용자 조회 api", description = "모든 사용자들의 정보를 조회하기 위한 요청")
     @GetMapping("/users")
-    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveAllUsers() {
-        List<UserResponse> userResponses = userService.retrieveAllUsers();
-        BaseResponse<List<UserResponse>> responses = new BaseResponse<>(userResponses);
+    public ResponseEntity<BaseResponse<List<UsersResponse>>> retrieveAllUsers() {
+        List<UsersResponse> userResponses = userService.retrieveAllUsers();
+        BaseResponse<List<UsersResponse>> responses = new BaseResponse<>(userResponses);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
@@ -129,15 +126,13 @@ public class UserController {
 
         log.info(String.valueOf(userId));
         UserResponse response = userService.retrieveUser(userId);
-
-        log.info(response.getEmail());
-
         BaseResponse<UserResponse> baseResponse = new BaseResponse<>(response);
+
         return ResponseEntity.status(HttpStatus.OK).body(baseResponse);
     }
 
     @GetMapping("/users/email/{email}")
-    public UserResponse retrieveUsers(@PathVariable String email) {
+    public UsersResponse retrieveUsers(@PathVariable String email) {
         log.info(email);
         return userService.retrieveUsers(email);
     }
@@ -186,11 +181,11 @@ public class UserController {
 
     @Operation(summary = "특정 전체 사용자 조회 api", description = "특정 모든 사용자들의 정보를 조회하기 위한 요청(ps id가 2이상일때만 사용가능)")
     @GetMapping("/users/particular")
-    public ResponseEntity<BaseResponse<List<UserResponse>>> retrieveUsersById(@RequestParam(value = "param",
+    public ResponseEntity<BaseResponse<List<UsersResponse>>> retrieveUsersById(@RequestParam(value = "param",
             required = false, defaultValue = "") List<Long> params) {
 
-        List<UserResponse> userResponses = userService.retrieveUsersByUserIds(params);
-        BaseResponse<List<UserResponse>> responses = new BaseResponse<>(userResponses);
+        List<UsersResponse> userResponses = userService.retrieveUsersByUserIds(params);
+        BaseResponse<List<UsersResponse>> responses = new BaseResponse<>(userResponses);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 }

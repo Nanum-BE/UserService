@@ -9,6 +9,7 @@ import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.userservice.user.vo.ModifyPasswordRequest;
 import com.nanum.userservice.user.vo.UserModifyRequest;
 import com.nanum.userservice.user.vo.UserResponse;
+import com.nanum.userservice.user.vo.UsersResponse;
 import com.nanum.utils.jwt.JwtTokenProvider;
 import com.nanum.utils.oauth.vo.OAuthUserRequest;
 import com.nanum.utils.s3.S3UploaderService;
@@ -70,9 +71,15 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
                 throw new ProfileImgNotFoundException();
             }
         } else {
-            userDto.setPwd(bCryptPasswordEncoder.encode(userDto.getPwd()));
-            User user = userDto.userDtoToEntity();
-            userRepository.save(user);
+            userRepository.save(User.builder()
+                    .email(userDto.getEmail())
+                    .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
+                    .isNoteReject(userDto.isNoteReject())
+                    .role(userDto.getRole())
+                    .nickname(userDto.getNickname())
+                    .phone(userDto.getPhone())
+                    .gender(userDto.getGender())
+                    .build());
         }
 
         return true;
@@ -194,13 +201,13 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     }
 
     @Override
-    public List<UserResponse> retrieveAllUsers() {
+    public List<UsersResponse> retrieveAllUsers() {
         List<User> userEntities = userRepository.findAll();
 
-        List<UserResponse> userResponses = new ArrayList<>();
+        List<UsersResponse> userResponses = new ArrayList<>();
 
         userEntities.forEach(user -> {
-            userResponses.add(UserResponse.builder()
+            userResponses.add(UsersResponse.builder()
                     .id(user.getId())
                     .email(user.getEmail())
                     .nickName(user.getNickname())
@@ -239,10 +246,13 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
                 .build();
     }
 
+    //feign (email을 기준으로 user info 조회)
     @Override
-    public UserResponse retrieveUsers(String email) {
+    public UsersResponse retrieveUsers(String email) {
+
         User user = userRepository.findByEmail(email);
-        return UserResponse.builder()
+
+        return UsersResponse.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .phone(user.getPhone())
@@ -255,16 +265,16 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     }
 
     @Override
-    public List<UserResponse> retrieveUsersByUserIds(List Longs) {
+    public List<UsersResponse> retrieveUsersByUserIds(List Longs) {
         List<User> users = userRepository.findAllById(Longs);
         if (users.size() < 1) {
             throw new UserNotFoundException(String.format("users[%s] not found", Longs));
         }
 
-        List<UserResponse> userResponses = new ArrayList<>();
+        List<UsersResponse> userResponses = new ArrayList<>();
 
         users.forEach(user -> {
-            userResponses.add(UserResponse.builder()
+            userResponses.add(UsersResponse.builder()
                     .id(user.getId())
                     .email(user.getEmail())
                     .nickName(user.getNickname())

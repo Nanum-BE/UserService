@@ -5,6 +5,7 @@ import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.vo.ModifyPasswordRequest;
 import com.nanum.userservice.user.vo.UserModifyRequest;
 import com.nanum.userservice.user.vo.UserResponse;
+import com.nanum.userservice.user.vo.UsersResponse;
 import com.nanum.utils.oauth.vo.OAuthUserRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,13 +28,13 @@ public interface UserService {
 
     User signOAuthUser(OAuthUserRequest userRequest);
 
-    List<UserResponse> retrieveAllUsers();
+    List<UsersResponse> retrieveAllUsers();
 
     UserResponse retrieveUser(Long userId);
 
-    UserResponse retrieveUsers(String email);
+    UsersResponse retrieveUsers(String email);
 
     // 박
-    List<UserResponse> retrieveUsersByUserIds(List Longs);
+    List<UsersResponse> retrieveUsersByUserIds(List Longs);
 
 }
