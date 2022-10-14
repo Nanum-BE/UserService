@@ -13,5 +13,3 @@ public class ExceptionResponse {
     private String details;
 
 }
-
-

@@ -5,12 +5,19 @@ spring:
     username: nanum
     password: spharos1234!
 
-    #    타임 아웃 설정 필수
-    hikari:
-      idle-timeout: 100000
-      max-lifetime: 580000
-      connection-timeout: 10000
-      validation-timeout: 10000
+  redis:
+    host: nanum-redis.redis.cache.windows.net
+    password: BDAMHPDXwVE1lmSGjYHPNOuZBE23xHXLqAzCaGLPsIU=
+    port: 6380
+    ssl: true
+
+#    #    타임 아웃 설정 필수
+#    hik
+#    ari:
+#      idle-timeout: 100000
+#      max-lifetime: 580000
+#      connection-timeout: 10000
+#      validation-timeout: 10000
 
   rabbitmq:
     port: 5672

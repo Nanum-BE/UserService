@@ -190,6 +190,7 @@ public class UserController {
         BaseResponse<List<UsersResponse>> responses = new BaseResponse<>(userResponses);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
+
     @Operation(summary = "특정 전체 사용자 조회 api", description = "특정 모든 사용자들의 정보를 조회하기 위한 요청(ps id가 2이상일때만 사용가능)")
     @GetMapping("/users/particular/mono")
     public Mono<ResponseEntity<BaseResponse<List<UsersResponse>>>> retrieveUsersByIdMono(@RequestParam(value = "param",
