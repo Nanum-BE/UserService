@@ -46,6 +46,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.9.2'
     // kafka 추가
     implementation 'org.springframework.kafka:spring-kafka:2.9.0'
 
