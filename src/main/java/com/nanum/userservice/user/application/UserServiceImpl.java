@@ -10,7 +10,6 @@ import com.nanum.userservice.user.vo.ModifyPasswordRequest;
 import com.nanum.userservice.user.vo.UserModifyRequest;
 import com.nanum.userservice.user.vo.UserResponse;
 import com.nanum.userservice.user.vo.UsersResponse;
-import com.nanum.utils.jwt.JwtTokenProvider;
 import com.nanum.utils.oauth.vo.OAuthUserRequest;
 import com.nanum.utils.s3.S3UploaderService;
 import com.nanum.utils.s3.dto.S3UploadDto;
@@ -25,7 +24,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +40,6 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final S3UploaderService s3UploaderService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public boolean createUser(UserDto userDto, MultipartFile multipartFile) {

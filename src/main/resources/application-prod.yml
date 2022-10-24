@@ -32,8 +32,9 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://20.214.170.222:8761/eureka
+
 management:
   endpoints:
     web:
       exposure:
-        include: busrefresh, health
+        include: busrefresh, info, metrics, prometheus
