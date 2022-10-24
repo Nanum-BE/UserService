@@ -204,7 +204,7 @@ public class UserController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/users/lists/{userId}")
+    @GetMapping("/houses/users/lists/{userId}")
     public ResponseEntity<Object> retrieveUserInfoByIds(@PathVariable List<Long> userId) {
         List<UserResponse> responses = userService.retrieveUserInfoByIds(userId);
         return ResponseEntity.status(HttpStatus.OK).body(new BaseResponse<>(responses));
