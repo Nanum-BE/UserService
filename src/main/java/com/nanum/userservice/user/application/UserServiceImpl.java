@@ -288,6 +288,26 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     }
 
     @Override
+    public List<UserResponse> retrieveUserInfoByIds(List<Long> userId) {
+        List<UserResponse> responses = new ArrayList<>();
+        for (Long a : userId) {
+            User user = userRepository.findById(a).get();
+            responses.add(UserResponse.builder()
+                    .id(user.getId())
+                    .nickName(user.getNickname())
+                    .email(user.getEmail())
+                    .profileImgUrl(user.getProfileImgPath())
+                    .isNoteReject(user.isNoteReject())
+                    .gender(user.getGender())
+                    .phone(user.getPhone())
+                    .createAt(user.getCreateAt())
+                    .build());
+        }
+        System.out.println("responses = " + responses);
+        return responses;
+    }
+
+    @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication)

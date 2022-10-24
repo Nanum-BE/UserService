@@ -37,4 +37,6 @@ public interface UserService {
     // 박
     List<UsersResponse> retrieveUsersByUserIds(List Longs);
 
+    List<UserResponse> retrieveUserInfoByIds(List<Long> userId);
+
 }
