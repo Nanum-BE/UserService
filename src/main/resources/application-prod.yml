@@ -1,10 +1,4 @@
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://user-service.mysql.database.azure.com/userDB?useSSL=false&allowMultiQueries=true&serverTimezone=UTC
-    username: nanum
-    password: spharos1234!
-
   redis:
     host: nanum-redis.redis.cache.windows.net
     password: BDAMHPDXwVE1lmSGjYHPNOuZBE23xHXLqAzCaGLPsIU=
