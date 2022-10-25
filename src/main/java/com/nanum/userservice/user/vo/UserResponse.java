@@ -1,6 +1,7 @@
 package com.nanum.userservice.user.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.nanum.userservice.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,4 +40,18 @@ public class UserResponse {
 
     @Schema(description = "계정 생성일자")
     private LocalDateTime createAt;
+
+    public static UserResponse of(User user) {
+        UserResponse userResponse = new UserResponse();
+        userResponse.id = user.getId();
+        userResponse.email = user.getEmail();
+        userResponse.nickName = user.getNickname();
+        userResponse.gender = user.getGender();
+        userResponse.phone = user.getPhone();
+        userResponse.createAt = user.getCreateAt();
+        userResponse.profileImgUrl = user.getProfileImgPath();
+        userResponse.isNoteReject = user.getIsNoteReject();
+
+        return userResponse;
+    }
 }

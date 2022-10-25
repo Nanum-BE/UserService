@@ -1,6 +1,7 @@
 package com.nanum.userservice.user.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.nanum.userservice.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,4 +43,19 @@ public class UsersResponse {
 
     @Schema(description = "계정 ID")
     private Long userId;
+
+    public static UsersResponse of(User user) {
+        UsersResponse usersResponse = new UsersResponse();
+        usersResponse.id = user.getId();
+        usersResponse.email = user.getEmail();
+        usersResponse.nickName = user.getNickname();
+        usersResponse.phone = user.getPhone();
+        usersResponse.isNoteReject = user.getIsNoteReject();
+        usersResponse.profileImgUrl = user.getProfileImgPath();
+        usersResponse.gender = user.getGender();
+        usersResponse.createAt = user.getCreateAt();
+        usersResponse.userId = user.getId();
+
+        return usersResponse;
+    }
 }

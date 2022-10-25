@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -116,7 +118,7 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
                         .saveName(s3UploadDto.getSaveName())
                         .originName(s3UploadDto.getOriginName())
                         .pwd(user.getPwd())
-                        .isNoteReject(request.isNoteReject())
+                        .isNoteReject(request.getIsNoteReject())
                         .gender(request.getGender())
                         .build());
 
@@ -137,7 +139,7 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
                     .saveName(user.getSaveName())
                     .originName(user.getOriginName())
                     .pwd(user.getPwd())
-                    .isNoteReject(request.isNoteReject())
+                    .isNoteReject(request.getIsNoteReject())
                     .gender(request.getGender())
                     .build());
     }
@@ -156,26 +158,9 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
                 .nickname(user.getNickname())
                 .phone(user.getPhone())
                 .profileImgPath(user.getProfileImgPath())
-                .isNoteReject(user.isNoteReject())
+                .isNoteReject(user.getIsNoteReject())
                 .pwd(bCryptPasswordEncoder.encode(passwordRequest.getNewPw()))
                 .build());
-    }
-
-    @Override
-    public UserDto getUserDetailsByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        if (user == null)
-            throw new UsernameNotFoundException(email);
-
-        return UserDto.builder()
-                .userId(user.getId())
-                .email(user.getEmail())
-                .nickname(user.getNickname())
-                .pwd(user.getPwd())
-                .role(user.getRole())
-                .gender(user.getGender())
-                .phone(user.getPhone())
-                .build();
     }
 
     @Override
@@ -197,26 +182,11 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
         return user;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UsersResponse> retrieveAllUsers() {
         List<User> userEntities = userRepository.findAll();
-
-        List<UsersResponse> userResponses = new ArrayList<>();
-
-        userEntities.forEach(user -> {
-            userResponses.add(UsersResponse.builder()
-                    .id(user.getId())
-                    .email(user.getEmail())
-                    .nickName(user.getNickname())
-                    .phone(user.getPhone())
-                    .isNoteReject(user.isNoteReject())
-                    .profileImgUrl(user.getProfileImgPath())
-                    .gender(user.getGender())
-                    .createAt(user.getCreateAt())
-                    .build());
-        });
-
-        return userResponses;
+        return userEntities.stream().map(UsersResponse::of).collect(Collectors.toList());
     }
 
     // 박찬흠 수정함
@@ -228,7 +198,6 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
         if (userEntity.isEmpty()) {
             throw new UserNotFoundException(String.format("ID[%s] not found", userId));
         }
-//        User user = userRepository.findById(userId).get();
         User user = userEntity.get();
 
         return UserResponse.builder()
@@ -236,29 +205,20 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
                 .email(user.getEmail())
                 .nickName(user.getNickname())
                 .phone(user.getPhone())
-                .isNoteReject(user.isNoteReject())
+                .isNoteReject(user.getIsNoteReject())
                 .profileImgUrl(user.getProfileImgPath())
                 .gender(user.getGender())
                 .createAt(user.getCreateAt())
                 .build();
     }
 
-    //feign (email을 기준으로 user info 조회)
+    @Transactional(readOnly = true)
     @Override
     public UsersResponse retrieveUsers(String email) {
 
         User user = userRepository.findByEmail(email);
 
-        return UsersResponse.builder()
-                .userId(user.getId())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .isNoteReject(user.isNoteReject())
-                .profileImgUrl(user.getProfileImgPath())
-                .nickName(user.getNickname())
-                .gender(user.getGender())
-                .createAt(user.getCreateAt())
-                .build();
+        return UsersResponse.of(user);
     }
 
     @Override
@@ -268,43 +228,20 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
             throw new UserNotFoundException(String.format("users[%s] not found", Longs));
         }
 
-        List<UsersResponse> userResponses = new ArrayList<>();
-
-        users.forEach(user -> {
-            userResponses.add(UsersResponse.builder()
-                    .id(user.getId())
-                    .email(user.getEmail())
-                    .nickName(user.getNickname())
-                    .phone(user.getPhone())
-                    .isNoteReject(user.isNoteReject())
-                    .profileImgUrl(user.getProfileImgPath())
-                    .gender(user.getGender())
-                    .createAt(user.getCreateAt())
-                    .userId(user.getId())
-                    .build());
-        });
-
-        return userResponses;
+        return users.stream()
+                .map(UsersResponse::of)
+                .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserResponse> retrieveUserInfoByIds(List<Long> userId) {
-        List<UserResponse> responses = new ArrayList<>();
-        for (Long a : userId) {
-            User user = userRepository.findById(a).get();
-            responses.add(UserResponse.builder()
-                    .id(user.getId())
-                    .nickName(user.getNickname())
-                    .email(user.getEmail())
-                    .profileImgUrl(user.getProfileImgPath())
-                    .isNoteReject(user.isNoteReject())
-                    .gender(user.getGender())
-                    .phone(user.getPhone())
-                    .createAt(user.getCreateAt())
-                    .build());
-        }
-        System.out.println("responses = " + responses);
-        return responses;
+        List<User> users = userId
+                .stream()
+                .map(a -> userRepository.findById(a).get())
+                .collect(Collectors.toList());
+
+        return users.stream().map(UserResponse::of).collect(Collectors.toList());
     }
 
     @Override

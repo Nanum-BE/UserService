@@ -32,8 +32,6 @@ public class RedisConfig {
 
     @Bean
     public RedisConfiguration defaultRedisConfig() {
-        log.info(host);
-        log.info(password);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(host);
         config.setPassword(RedisPassword.of(password));

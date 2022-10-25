@@ -1,11 +1,11 @@
-package com.nanum.utils.sms.presentation;
+package com.nanum.utils.sms.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nanum.utils.sms.application.PhoneAuthService;
 import com.nanum.utils.sms.dto.MessageDto;
 import com.nanum.utils.sms.dto.MessageDtoReq;
 import com.nanum.utils.sms.vo.ConfirmSMS;
-import com.nanum.utils.sms.vo.RequestSMS;
 import com.nanum.utils.sms.vo.ResponseSMS;
 import com.nanum.utils.sms.vo.RedisService;
 import lombok.RequiredArgsConstructor;
@@ -101,6 +101,75 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
             e.printStackTrace();
         }
         return responseSMS;
+    }
+
+    @Override
+    public ResponseSMS sendTourAndMoveInMessage(String tel, Long status) {
+        ResponseSMS responseSMS = null;
+        try {
+            responseSMS = sendTourMsg(tel, status);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseSMS;
+    }
+
+    public ResponseSMS sendTourMsg(String tel, Long status) throws Exception {
+        String time = Long.toString(System.currentTimeMillis());
+        List<MessageDto> messagesDtos = new ArrayList<>();
+        if (status == 0) {
+            messagesDtos.add(new MessageDto(tel, "투어 신청이 승인완료되었습니다."));
+        } else if (status == 1) {
+            messagesDtos.add(new MessageDto(tel, "투어 신청이 호스트에 의해 거절되었습니다."));
+        } else if (status == 2) {
+            messagesDtos.add(new MessageDto(tel, "신청하신 투어가 완료되었습니다 감사합니다."));
+        } else if (status == 3) {
+            messagesDtos.add(new MessageDto(tel, "입주 신청이 승인되었습니다."));
+        } else if (status == 4) {
+            messagesDtos.add(new MessageDto(tel, "입주 신청이 호스트에 의해 거절되었습니다."));
+        } else if (status == 5) {
+            messagesDtos.add(new MessageDto(tel, "호스트와의 입주 계약이 완료되었습니다! " +
+                    "입주를 축하드립니다 :)"));
+        }
+
+        this.serviceId = env.getProperty("sms.serviceId");
+        this.accessKey = env.getProperty("sms.accessKey");
+        this.secretKey = env.getProperty("sms.secretKey");
+        this.senderPhone = env.getProperty("sms.senderPhone");
+
+        MessageDtoReq messagesDtoReq = new MessageDtoReq("SMS", "COMM", "82", senderPhone, "SMS 문자 인증", messagesDtos);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonBody;
+
+        try {
+            jsonBody = objectMapper.writeValueAsString(messagesDtoReq);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("x-ncp-apigw-timestamp", time);
+        headers.set("x-ncp-iam-access-key", this.accessKey);
+        String sig = makeSignature(time);
+        headers.set("x-ncp-apigw-signature-v2", sig);
+
+        HttpEntity<String> body = new HttpEntity<>(jsonBody, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        ResponseSMS smsAuthDtoRes;
+        try {
+            smsAuthDtoRes = restTemplate.postForObject(new URI("https://sens.apigw.ntruss.com/sms/v2/services/"
+                    + this.serviceId + "/messages"), body, ResponseSMS.class);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+
+        return smsAuthDtoRes;
+
     }
 
     public ResponseSMS sendMsg(String tel, String rand) throws Exception {

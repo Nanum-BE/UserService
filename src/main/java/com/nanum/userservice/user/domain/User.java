@@ -56,7 +56,7 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Comment("사용자 쪽지수신 동의 여부, true -> 1/ false -> 0")
     @Schema(defaultValue = "0")
-    private boolean isNoteReject;
+    private Boolean isNoteReject;
 
     @Comment("경고횟수")
     @Schema(defaultValue = "0")

@@ -24,8 +24,6 @@ public interface UserService {
 
     void modifyUserPw(Long userId, ModifyPasswordRequest passwordRequest);
 
-    UserDto getUserDetailsByEmail(String email);
-
     User signOAuthUser(OAuthUserRequest userRequest);
 
     List<UsersResponse> retrieveAllUsers();

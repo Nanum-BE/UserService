@@ -70,14 +70,9 @@ public class UserController {
         BaseResponse<String> response = new BaseResponse<>(result);
 
         Boolean user = null;
-        //null인 상태는 아예 value를 넣지 않았을 경우고 isEmpty는 value에 넣긴했는데 사진을 선택하지 않았을 경우
         if (multipartFile != null && !multipartFile.isEmpty()) {
-            log.info("12121212");
             user = userService.createUser(userDto, multipartFile);
         } else {
-            log.info(multipartFile.toString());
-            log.info("***********");
-
             userService.createUser(userDto, null);
         }
 
@@ -126,7 +121,6 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<BaseResponse<UserResponse>> retrieveUser(@PathVariable Long userId) {
 
-        log.info(String.valueOf(userId));
         UserResponse response = userService.retrieveUser(userId);
         BaseResponse<UserResponse> baseResponse = new BaseResponse<>(response);
 
@@ -135,7 +129,6 @@ public class UserController {
 
     @GetMapping("/users/email/{email}")
     public UsersResponse retrieveUsers(@PathVariable String email) {
-        log.info(email);
         return userService.retrieveUsers(email);
     }
 

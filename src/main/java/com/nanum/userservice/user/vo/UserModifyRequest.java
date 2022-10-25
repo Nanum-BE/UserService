@@ -34,9 +34,8 @@ public class UserModifyRequest {
     
     //TODO 쪽지수신여부가 true, false가 안바뀜
     @NotNull
-    @Schema(description = "쪽지수신 허용 여부", defaultValue = "false")
     @Comment("true false로 쪽지 수신 허용 여부를 나눈다")
-    private boolean isNoteReject;
+    private Boolean isNoteReject;
 
     @Schema(description = "프로필 이미지 url")
     @Comment("사용자 프로필 이미지")
