@@ -39,7 +39,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> kakao_account = null;
         String email;
-        String socialType = null;
+        String socialType;
+        String nickName;
 
         log.info(String.valueOf(authentication));
         log.info(String.valueOf(authentication.getPrincipal()));
@@ -51,8 +52,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             socialType = "kakao";
             kakao_account = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
             email = String.valueOf(kakao_account.get("email"));
+            nickName = String.valueOf(kakao_account.get("nickname"));
         } else {
             email = String.valueOf(oAuth2User.getAttributes().get("email"));
+            nickName = String.valueOf(oAuth2User.getAttributes().get("nickname"));
+            socialType = "kakao";
         }
 
         User user = userRepository.findByEmail(email);
@@ -63,27 +67,35 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             response.addHeader("Authorization", socialToken);
             getRedirectStrategy().sendRedirect(request, response, url);
         }
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-
-        Map<String, Object> kakao_profile = (Map<String, Object>) kakao_account.get("profile");
-
-        Map<String, String> userInfo = new HashMap<>();
-
-        log.info(String.valueOf(kakao_account));
-        log.info(String.valueOf(kakao_profile));
-
-        userInfo.put("email", String.valueOf(kakao_account.get("email")));
-        userInfo.put("nickname", String.valueOf(kakao_profile.get("nickname")));
-        userInfo.put("socialType", socialType);
-
-        BaseResponse<Map<String, String>> baseResponse = new BaseResponse<>(userInfo);
-
-        mapper.writeValue(response.getOutputStream(), baseResponse);
+        String url = sendInfoToRedirectUrl(email, nickName, socialType);
+        getRedirectStrategy().sendRedirect(request, response, url);
+//        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//        response.setCharacterEncoding("UTF-8");
+//
+//        Map<String, Object> kakao_profile = (Map<String, Object>) kakao_account.get("profile");
+//
+//        Map<String, String> userInfo = new HashMap<>();
+//
+//        log.info(String.valueOf(kakao_account));
+//        log.info(String.valueOf(kakao_profile));
+//
+//        userInfo.put("email", String.valueOf(kakao_account.get("email")));
+//        userInfo.put("nickname", String.valueOf(kakao_profile.get("nickname")));
+//        userInfo.put("socialType", socialType);
+//
+//        BaseResponse<Map<String, String>> baseResponse = new BaseResponse<>(userInfo);
+//
+//        mapper.writeValue(response.getOutputStream(), baseResponse);
     }
 
     private String makeRedirectUrl(String token, Long userId) {
         return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login" + token + "/" + userId)
+                .build().toUriString();
+    }
+
+    private String sendInfoToRedirectUrl(String email, String nickName,String socialType) {
+        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + email
+        + "/" + nickName + "/" + socialType)
                 .build().toUriString();
     }
 
