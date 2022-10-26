@@ -68,7 +68,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String makeRedirectUrl(String token, Long userId) {
-        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + token + "/" + userId)
+        String t = "/";
+        return UriComponentsBuilder.fromUriString("https://nanum.site/user-service/api/v1/oauth/social" + t + token + "/" + userId)
                 .build().toUriString();
     }
 

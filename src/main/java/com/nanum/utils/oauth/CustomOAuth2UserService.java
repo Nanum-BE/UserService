@@ -49,10 +49,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if (userRepository.existsByEmail(attributes.getEmail())) {
             user = userRepository.findByEmail(attributes.getEmail());
             return user;
-        }
-        return redisService.createTemporalOAuthUser(attributes.getEmail(),
-                attributes.getNickname(),
-                attributes,
-                socialType);
+        } else
+            return redisService.createTemporalOAuthUser(attributes.getEmail(),
+                    attributes.getNickname(),
+                    attributes,
+                    socialType);
     }
 }

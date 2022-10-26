@@ -41,7 +41,6 @@ import java.util.Map;
 public class OAuthController {
 
     private final UserService userService;
-    private final UserServiceImpl userServiceImpl;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "소셜 회원가입 요청 api", description = "추가 정보들 입력한 후 회원가입 요청")
