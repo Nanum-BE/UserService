@@ -54,7 +54,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             kakao_account = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
             kakao_profile = (Map<String, Object>) kakao_account.get("profile");
             email = String.valueOf(kakao_account.get("email"));
-            nickName = String.valueOf(kakao_profile.get("nickname"));
+            log.info(kakao_profile.get("nickname").toString());
+            nickName = String.valueOf(kakao_profile.get("nickname").toString());
+            log.info(String.valueOf(kakao_account));
+            log.info(String.valueOf(kakao_profile));
         } else {
             email = String.valueOf(oAuth2User.getAttributes().get("email"));
             nickName = String.valueOf(oAuth2User.getAttributes().get("nickname"));
@@ -69,6 +72,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             response.addHeader("Authorization", socialToken);
             getRedirectStrategy().sendRedirect(request, response, url);
         }
+        log.info(nickName);
         String url = sendInfoToRedirectUrl(email, nickName, socialType);
         getRedirectStrategy().sendRedirect(request, response, url);
 //        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -95,7 +99,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String sendInfoToRedirectUrl(String email, String nickName,String socialType) {
-        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao"  + email + "/nickname=" + nickName + "/socialType=" + socialType)
+        String e = "?email=";
+        String n = "?nickname=";
+        String s = "?socialType=";
+        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + e + email + n + nickName + s + socialType)
                 .build().toUriString();
     }
 
