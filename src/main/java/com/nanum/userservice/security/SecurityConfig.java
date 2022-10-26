@@ -44,6 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/**").permitAll()
+                .antMatchers("/oauth2/**").permitAll()
                 .and()
                 .addFilterBefore(corsConfig.corsFilter(),
                         SecurityContextPersistenceFilter.class)
@@ -55,9 +56,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorization")
                 .and()
-                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .redirectionEndpoint()
+                .baseUri("/login/oauth2")
+                .and()
                 .userInfoEndpoint()
-                .userService(customOAuth2UserService);
+                .userService(customOAuth2UserService)
+                .and()
+                .successHandler(oAuth2AuthenticationSuccessHandler);
 
         http.headers().frameOptions().disable();
     }
