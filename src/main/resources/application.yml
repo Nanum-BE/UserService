@@ -29,7 +29,7 @@ spring:
             client-secret: g19bIu9gSbNOUOEAE7AdTGOCawwYSKQ2
             scope: profile_nickname, account_email
             client-authentication-method: POST
-            redirect-uri: 'http://ec2-3-37-166-100.ap-northeast-2.compute.amazonaws.com/login/oauth2/code/kakao'
+            redirect-uri: 'http://3.37.166.100/login/oauth2/code/kakao'
             client-name: kakao
 
           google:
