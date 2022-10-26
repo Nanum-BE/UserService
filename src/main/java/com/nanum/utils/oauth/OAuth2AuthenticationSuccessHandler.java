@@ -17,6 +17,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -105,7 +108,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String n = "/nickname=";
         String s = "/socialType=";
 
-        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + e + email + n + nickName + s + socialType)
+        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + e + email + n + URLDecoder.decode(nickName) + s + socialType)
                 .build().toUriString();
     }
 
