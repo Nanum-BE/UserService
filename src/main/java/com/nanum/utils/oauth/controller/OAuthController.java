@@ -1,6 +1,7 @@
 package com.nanum.utils.oauth.controller;
 
 import com.nanum.config.BaseResponse;
+import com.nanum.config.Role;
 import com.nanum.userservice.user.application.UserService;
 import com.nanum.userservice.user.application.UserServiceImpl;
 import com.nanum.userservice.user.domain.User;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -56,5 +58,17 @@ public class OAuthController {
 
         BaseResponse<HashMap<Object, Object>> response = new BaseResponse<>(result);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/social/{token}/{userId}")
+    public ResponseEntity<Object> socialSuccess(@PathVariable String token, @PathVariable Long userId) {
+        Map<String, String> tokenDto = new HashMap<>();
+
+        tokenDto.put("accessToken", token);
+        tokenDto.put("userId", String.valueOf(userId));
+        tokenDto.put("role", String.valueOf(Role.USER));
+
+        BaseResponse<Map<String, String>> baseResponse = new BaseResponse<>(tokenDto);
+        return ResponseEntity.status(HttpStatus.OK).body(baseResponse);
     }
 }

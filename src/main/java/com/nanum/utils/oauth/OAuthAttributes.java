@@ -17,7 +17,6 @@ import java.util.Map;
 @Getter
 public class OAuthAttributes {
     private Map<String, Object> attributes;
-    private OAuthProvider oAuthProvider;
     private String nameAttributeKey;
     private String nickname;
     private String mobile;

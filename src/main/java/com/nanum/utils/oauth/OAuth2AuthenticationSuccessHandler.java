@@ -59,7 +59,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         if (userRepository.existsByEmail(email)) {
             String socialToken = jwtTokenProvider.createSocialToken(user.getId());
-            String url = makeRedirectUrl(socialToken);
+            String url = makeRedirectUrl(socialToken, user.getId());
             response.addHeader("Authorization", socialToken);
             getRedirectStrategy().sendRedirect(request, response, url);
         }
@@ -82,8 +82,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         mapper.writeValue(response.getOutputStream(), baseResponse);
     }
 
-    private String makeRedirectUrl(String token) {
-        return UriComponentsBuilder.fromUriString("http://ec2-3-37-166-100.ap-northeast-2.compute.amazonaws.com:8000/login/oauth2/code/kakao" + token)
+    private String makeRedirectUrl(String token, Long userId) {
+        return UriComponentsBuilder.fromUriString("https://nanum.site/user-service/api/v1/" + token + "/" + userId)
                 .build().toUriString();
     }
 
