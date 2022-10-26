@@ -95,8 +95,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String sendInfoToRedirectUrl(String email, String nickName,String socialType) {
-        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao?"
-                        + "email=" + email + "/" + nickName + "/" + socialType)
+        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao"
+                        + "?email=" + email + "/" + nickName + "/" + socialType)
                 .build().toUriString();
     }
 
