@@ -50,6 +50,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         log.info(String.valueOf(attributes.getRole()));
 
         User user = createSocialUser(attributes, socialType);
+        log.info(user.getNickname());
+        log.info(user.getEmail());
 
         return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole())),
                 attributes.getAttributes(),
