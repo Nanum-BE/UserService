@@ -54,16 +54,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         User user = userRepository.findByEmail(email);
+        System.out.println("userRepository.existsByEmail(email) = " + userRepository.existsByEmail(email));
         String url;
         if (userRepository.existsByEmail(email)) {
             String socialToken = jwtTokenProvider.createSocialToken(user.getId());
             url = makeRedirectUrl(socialToken, user.getId());
             response.addHeader("Authorization", socialToken);
-            getRedirectStrategy().sendRedirect(request, response, url);
-        } else
+        } else {
             url = sendInfoToRedirectUrl(email, nickName, socialType);
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
+        }
         getRedirectStrategy().sendRedirect(request, response, url);
     }
 
