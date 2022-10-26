@@ -68,7 +68,8 @@ public class OAuthAttributes {
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> kakao_account = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakao_profile = (Map<String, Object>) kakao_account.get("profile");
-;
+        System.out.println("kakao_profile = " + kakao_profile);
+        System.out.println("kakao_account = " + kakao_account);
         return OAuthAttributes.builder()
                 .email(String.valueOf(kakao_account.get("email")))
                 .nickname(String.valueOf(kakao_profile.get("nickname")))

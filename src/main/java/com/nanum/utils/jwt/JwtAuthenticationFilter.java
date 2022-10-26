@@ -26,8 +26,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             throws IOException, ServletException, InformationDismatchException {
         String token = jwtTokenProvider.getToken((HttpServletRequest) request);
 
-        log.info(token);
-
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
