@@ -8,14 +8,11 @@ import com.nanum.utils.jwt.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-
 
 @Component
 @RequiredArgsConstructor
@@ -36,22 +33,15 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         String username = token.getName();
         String password = (String) token.getCredentials();
 
-        log.info("authentication:{}", username);
-
         UserDetailsImpl userDetail;
 
         User userEmail = userRepository.findByEmail(username);
         userDetail = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
 
-        log.info(password);
-        log.info(userEmail.getPwd());
-        log.info(bCryptPasswordEncoder.encode("123456789"));
         if (!bCryptPasswordEncoder.matches(password, userEmail.getPwd())) {
-            log.info("----");
             throw new InformationDismatchException();
         }
 
-        log.info("----");
         return new UsernamePasswordAuthenticationToken(userDetail.getUsername(), "", userDetail.getAuthorities());
     }
 

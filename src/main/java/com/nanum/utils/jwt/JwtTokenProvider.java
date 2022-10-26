@@ -32,9 +32,6 @@ public class JwtTokenProvider {
 
     public String createToken(Authentication authentication, Long userId) {
 
-        log.info(String.valueOf(tokenValidTime));
-        log.info(secretKey);
-
         Claims claims = Jwts.claims().setSubject(String.valueOf(authentication.getPrincipal()));
         claims.put("Id", userId);
         claims.put("role", authentication.getAuthorities());
@@ -68,14 +65,13 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        log.info(token);
         UserDetails userDetails = userDetailService.loadUserByUsername(this.getUserPk(token));
-        log.info(String.valueOf(userDetails));
+
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String getUserPk(String token) {
-        log.info(token);
+
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getId();
     }
 

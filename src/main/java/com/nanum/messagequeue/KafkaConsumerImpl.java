@@ -9,7 +9,6 @@ import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,10 +22,9 @@ public class KafkaConsumerImpl implements KafkaConsumer{
     private final UserRepository userRepository;
 
     public void updateWarnCnt(String kafkaMessage){
-        log.info("Kafka Message: ->" + kafkaMessage);
-
         Map<Object, Object> map  = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
+
         try {
             map = mapper.readValue(kafkaMessage, new TypeReference<>() {
             });

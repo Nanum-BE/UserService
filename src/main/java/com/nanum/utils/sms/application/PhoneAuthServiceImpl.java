@@ -2,12 +2,11 @@ package com.nanum.utils.sms.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nanum.utils.sms.application.PhoneAuthService;
 import com.nanum.utils.sms.dto.MessageDto;
 import com.nanum.utils.sms.dto.MessageDtoReq;
 import com.nanum.utils.sms.vo.ConfirmSMS;
-import com.nanum.utils.sms.vo.ResponseSMS;
 import com.nanum.utils.sms.vo.RedisService;
+import com.nanum.utils.sms.vo.ResponseSMS;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;

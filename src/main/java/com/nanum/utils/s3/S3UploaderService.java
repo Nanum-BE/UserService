@@ -1,5 +1,6 @@
 package com.nanum.utils.s3;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.nanum.utils.s3.dto.S3UploadDto;
@@ -7,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.amazonaws.services.s3.AmazonS3Client;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,10 +50,8 @@ public class S3UploaderService {
     // 로컬에 저장된 이미지 지우기
     private void removeNewFile(File targetFile) {
         if (targetFile.delete()) {
-            log.info("File delete success");
             return;
         }
-        log.info("File delete fail");
     }
 
     /**

@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -40,8 +39,6 @@ public class RedisService {
         vop.set("email", email, Duration.ofSeconds(60 * 10));
         vop.set("nickname", nickname, Duration.ofSeconds(60 * 10));
         vop.set("socialType", socialType, Duration.ofSeconds(60*10));
-
-        log.info(socialType);
 
         return User.builder()
                 .email(vop.get("email"))

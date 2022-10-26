@@ -37,9 +37,7 @@ public class OAuthAttributes {
     }
 
     private static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
-        log.info("-----------");
-        log.info(String.valueOf(attributes));
-        log.info(String.valueOf(attributes.get("profile")));
+
         return OAuthAttributes.builder()
                 .email(String.valueOf(attributes.get("email")))
                 .nickname(String.valueOf(attributes.get("name")))
@@ -50,10 +48,6 @@ public class OAuthAttributes {
 
     private static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-
-        log.info("-------------");
-        log.info(userNameAttributeName);
-        log.info(String.valueOf(attributes));
 
         return OAuthAttributes.builder()
                 .email(String.valueOf(response.get("email")))
@@ -68,8 +62,7 @@ public class OAuthAttributes {
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> kakao_account = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakao_profile = (Map<String, Object>) kakao_account.get("profile");
-        System.out.println("kakao_profile = " + kakao_profile);
-        System.out.println("kakao_account = " + kakao_account);
+
         return OAuthAttributes.builder()
                 .email(String.valueOf(kakao_account.get("email")))
                 .nickname(String.valueOf(kakao_profile.get("nickname")))
@@ -79,6 +72,7 @@ public class OAuthAttributes {
     }
 
     public User toEntity(String socialType) {
+
         return User.builder()
                 .email(email)
                 .phone(mobile)

@@ -11,8 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -22,9 +20,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException, InformationDismatchException {
-        log.info(email);
         User user = userRepository.findByEmail(email);
-        log.info(String.valueOf(user));
         if (user == null) {
             throw new BadCredentialsException("이메일 혹은 비밀번호가 틀렸습니다");
         }
