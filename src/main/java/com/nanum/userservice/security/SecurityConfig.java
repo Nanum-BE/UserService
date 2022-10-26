@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .oauth2Login()
                 .authorizationEndpoint()
+                .baseUri("/oauth2/authorization")
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler)
                 .userInfoEndpoint()
