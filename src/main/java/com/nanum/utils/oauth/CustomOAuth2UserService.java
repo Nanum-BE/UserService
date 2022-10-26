@@ -59,6 +59,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     public User createSocialUser(OAuthAttributes attributes, String socialType) {
 
         log.info(env.getProperty("token.expiration_time"));
+        log.info(attributes.getNickname());
+        log.info(String.valueOf(attributes.getAttributes().get("nickname")));
         User user;
 
         if (userRepository.existsByEmail(attributes.getEmail())) {
