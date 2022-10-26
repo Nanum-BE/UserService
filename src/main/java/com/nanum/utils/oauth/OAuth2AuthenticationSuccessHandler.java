@@ -83,7 +83,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String makeRedirectUrl(String token) {
-        return UriComponentsBuilder.fromUriString("http://localhost:9091/login/oauth2/code/kakao" + token)
+        return UriComponentsBuilder.fromUriString("http://ec2-3-37-166-100.ap-northeast-2.compute.amazonaws.com:8000/login/oauth2/code/kakao" + token)
                 .build().toUriString();
     }
 
