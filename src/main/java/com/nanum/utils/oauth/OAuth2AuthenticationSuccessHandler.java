@@ -74,6 +74,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
         log.info(nickName);
         String url = sendInfoToRedirectUrl(email, nickName, socialType);
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpServletResponse.SC_ACCEPTED);
         getRedirectStrategy().sendRedirect(request, response, url);
 //        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 //        response.setCharacterEncoding("UTF-8");
@@ -98,10 +100,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .build().toUriString();
     }
 
-    private String sendInfoToRedirectUrl(String email, String nickName,String socialType) {
-        String e = "?email=";
-        String n = "?nickname=";
-        String s = "?socialType=";
+    private String sendInfoToRedirectUrl(String email, String nickName, String socialType) {
+        String e = "/email=";
+        String n = "/nickname=";
+        String s = "/socialType=";
         return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + e + email + n + nickName + s + socialType)
                 .build().toUriString();
     }
