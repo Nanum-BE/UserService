@@ -83,7 +83,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String makeRedirectUrl(String token, Long userId) {
-        return UriComponentsBuilder.fromUriString("https://nanum.site/user-service/api/v1/" + token + "/" + userId)
+        return UriComponentsBuilder.fromUriString("http://localhost:8000/login" + token + "/" + userId)
                 .build().toUriString();
     }
 
