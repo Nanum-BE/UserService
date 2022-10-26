@@ -17,7 +17,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -103,12 +105,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .build().toUriString();
     }
 
-    private String sendInfoToRedirectUrl(String email, String nickName, String socialType) {
+    private String sendInfoToRedirectUrl(String email, String nickName, String socialType) throws UnsupportedEncodingException {
         String e = "/email=";
         String n = "/nickname=";
         String s = "/socialType=";
+        String encode = URLEncoder.encode(nickName, StandardCharsets.UTF_8);
 
-        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + e + email + n + URLDecoder.decode(nickName) + s + socialType)
+        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + e + email + n + encode + s + socialType)
                 .build().toUriString();
     }
 
