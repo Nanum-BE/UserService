@@ -37,7 +37,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         log.info("-++--+-+-+-+-+-+-+-");
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        Map<String, Object> kakao_account = null;
+        Map<String, Object> kakao_account;
+        Map<String, Object> kakao_profile;
         String email;
         String socialType;
         String nickName;
@@ -51,8 +52,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         if (oAuth2User.getAttributes().containsKey("kakao_account")) {
             socialType = "kakao";
             kakao_account = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+            kakao_profile = (Map<String, Object>) kakao_account.get("profile");
             email = String.valueOf(kakao_account.get("email"));
-            nickName = String.valueOf(kakao_account.get("nickname"));
+            nickName = String.valueOf(kakao_profile.get("nickname"));
         } else {
             email = String.valueOf(oAuth2User.getAttributes().get("email"));
             nickName = String.valueOf(oAuth2User.getAttributes().get("nickname"));
@@ -72,7 +74,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 //        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 //        response.setCharacterEncoding("UTF-8");
 //
-//        Map<String, Object> kakao_profile = (Map<String, Object>) kakao_account.get("profile");
 //
 //        Map<String, String> userInfo = new HashMap<>();
 //
@@ -94,8 +95,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String sendInfoToRedirectUrl(String email, String nickName,String socialType) {
-        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + email
-        + "/" + nickName + "/" + socialType)
+        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao?"
+                        + "email=" + email + "/" + nickName + "/" + socialType)
                 .build().toUriString();
     }
 
