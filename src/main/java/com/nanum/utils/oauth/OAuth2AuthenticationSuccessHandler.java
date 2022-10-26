@@ -104,6 +104,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String e = "/email=";
         String n = "/nickname=";
         String s = "/socialType=";
+
         return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + e + email + n + nickName + s + socialType)
                 .build().toUriString();
     }
