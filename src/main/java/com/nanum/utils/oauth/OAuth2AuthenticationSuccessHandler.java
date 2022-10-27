@@ -14,7 +14,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -89,7 +88,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .build().toUriString();
     }
 
-    private String sendInfoToRedirectUrl(String email, String nickName, String socialType) throws UnsupportedEncodingException {
+    private String sendInfoToRedirectUrl(String email, String nickName, String socialType) {
         String e = "/email=";
         String n = "/nickname=";
         String s = "/socialType=";
@@ -99,17 +98,19 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .build().toUriString();
     }
 
-    private String sendInfoToNaverRedirectUrl(String email, String nickName, String socialType, String mobile, String gender) throws UnsupportedEncodingException {
+    private String sendInfoToNaverRedirectUrl(String email, String nickName, String socialType, String mobile, String gender) {
         String e = "/email=";
         String n = "/nickname=";
         String s = "/socialType=";
-        String m = "/mobile";
-        String g = "/gender";
+        String m = "/mobile=";
+        String g = "/gender=";
 
         String encode = URLEncoder.encode(nickName, StandardCharsets.UTF_8);
 
+        String num = mobile.replaceAll("-", "");
+
         return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/social" + e + email
-                        + n + encode + s + socialType + m + mobile + g + gender)
+                        + n + encode + s + socialType + m + num + g + gender)
                 .build().toUriString();
     }
 
