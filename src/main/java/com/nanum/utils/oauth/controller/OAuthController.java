@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,14 +61,9 @@ public class OAuthController {
     }
 
     @GetMapping("/social/{token}/{userId}")
-    public ResponseEntity<Object> socialSuccess(@PathVariable String token, @PathVariable Long userId) {
-        Map<String, String> tokenDto = new HashMap<>();
+    public String socialSuccess(@PathVariable String token, @PathVariable Long userId) {
 
-        tokenDto.put("accessToken", token);
-        tokenDto.put("userId", String.valueOf(userId));
-        tokenDto.put("role", String.valueOf(Role.USER));
-
-        BaseResponse<Map<String, String>> baseResponse = new BaseResponse<>(tokenDto);
-        return ResponseEntity.status(HttpStatus.OK).body(baseResponse);
+        return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/social" + "/userId=" + userId
+        + "/role=" + Role.USER + "/token=" + token).toUriString();
     }
 }
