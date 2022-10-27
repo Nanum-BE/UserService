@@ -60,10 +60,10 @@ public class OAuthController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/social/{token}/{userId}")
-    public String socialSuccess(@PathVariable String token, @PathVariable Long userId) {
+    @GetMapping("/social/{userId}/{role}/{token}")
+    public String socialSuccess(@PathVariable Long userId, @PathVariable Role role, @PathVariable String token) {
 
         return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/social" + "/userId=" + userId
-        + "/role=" + Role.USER + "/token=" + token).toUriString();
+        + "/role=" + role + "/token=" + token).toUriString();
     }
 }

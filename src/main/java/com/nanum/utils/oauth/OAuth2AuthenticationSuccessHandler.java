@@ -1,5 +1,6 @@
 package com.nanum.utils.oauth;
 
+import com.nanum.config.Role;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.utils.jwt.JwtTokenProvider;
@@ -64,7 +65,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String url;
         if (userRepository.existsByEmail(email)) {
             String socialToken = jwtTokenProvider.createSocialToken(user.getId());
-            url = makeRedirectUrl(socialToken, user.getId());
+            url = sendExistInfoToRedirectUrI(socialToken, user.getId());
             response.addHeader("Authorization", socialToken);
         } else {
             if (socialType.equals("naver")) {
@@ -82,9 +83,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, url);
     }
 
-    private String makeRedirectUrl(String token, Long userId) {
-        String t = "/";
-        return UriComponentsBuilder.fromUriString("https://nanum.site/user-service/api/v1/oauth/social" + t + token + "/" + userId)
+    private String sendExistInfoToRedirectUrI(String token, Long userId) {
+        return UriComponentsBuilder.fromUriString("https://nanum.site/user-service/api/v1/oauth/social"
+                        + "/" + userId + "/" + Role.USER + "/" + token)
                 .build().toUriString();
     }
 
