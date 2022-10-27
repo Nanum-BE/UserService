@@ -20,7 +20,7 @@ spring:
             authorization-grant-type: authorization_code
             client-secret: ZLCkJYhudO
             client-id: DlmIo1AnHsg_vbhA10Uq
-            redirect_uri: 'http://localhost:9091/login/oauth2/code/naver'
+            redirect_uri: 'https://nanum.site/login/oauth2/code/social'
             client-name: Naver
 
           kakao:
