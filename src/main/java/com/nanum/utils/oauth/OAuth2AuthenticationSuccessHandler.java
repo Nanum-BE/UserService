@@ -77,7 +77,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String s = "/socialType=";
         String encode = URLEncoder.encode(nickName, StandardCharsets.UTF_8);
 
-        return UriComponentsBuilder.fromUriString("http://3.37.166.100:8000/login/oauth2/code/kakao" + e + email + n + encode + s + socialType)
+        return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/kakao" + e + email + n + encode + s + socialType)
                 .build().toUriString();
     }
 
