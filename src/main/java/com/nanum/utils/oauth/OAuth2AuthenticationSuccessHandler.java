@@ -48,7 +48,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             kakao_profile = (Map<String, Object>) kakao_account.get("profile");
             email = String.valueOf(kakao_account.get("email"));
             nickName = String.valueOf(kakao_profile.get("nickname").toString());
-        } else if (oAuth2User.getAttributes().containsKey("response")) {
+        } else if (oAuth2User.getAttributes().containsKey("mobile")) {
             log.info(String.valueOf(oAuth2User.getAttributes().keySet()));
             email = String.valueOf(oAuth2User.getAttributes().get("email"));
             nickName = String.valueOf(oAuth2User.getAttributes().get("nickname"));
