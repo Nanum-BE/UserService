@@ -32,8 +32,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
-        log.info("-++--+-+-+-+-+-+-+-");
-
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> kakao_account;
         Map<String, Object> kakao_profile;
@@ -54,7 +52,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         User user = userRepository.findByEmail(email);
-        System.out.println("userRepository.existsByEmail(email) = " + userRepository.existsByEmail(email));
         String url;
         if (userRepository.existsByEmail(email)) {
             String socialToken = jwtTokenProvider.createSocialToken(user.getId());
