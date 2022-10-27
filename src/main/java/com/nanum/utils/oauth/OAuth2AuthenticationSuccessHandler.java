@@ -38,6 +38,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String email;
         String socialType;
         String nickName;
+        String mobile = null;
+        String gender = null;
 
         System.out.println("oAuth2User.getAttributes() = " + oAuth2User.getAttributes());
         if (oAuth2User.getAttributes().containsKey("kakao_account")) {
@@ -46,8 +48,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             kakao_profile = (Map<String, Object>) kakao_account.get("profile");
             email = String.valueOf(kakao_account.get("email"));
             nickName = String.valueOf(kakao_profile.get("nickname").toString());
-        } else {
+        } else if (oAuth2User.getAttributes().containsKey("response")) {
             log.info(String.valueOf(oAuth2User.getAttributes().keySet()));
+            email = String.valueOf(oAuth2User.getAttributes().get("email"));
+            nickName = String.valueOf(oAuth2User.getAttributes().get("nickname"));
+            mobile = String.valueOf(oAuth2User.getAttributes().get("mobile"));
+            gender = String.valueOf(oAuth2User.getAttributes().get("gender"));
+            socialType = "naver";
+        } else {
             email = String.valueOf(oAuth2User.getAttributes().get("email"));
             nickName = String.valueOf(oAuth2User.getAttributes().get("name"));
             socialType = "google";
@@ -60,11 +68,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             url = makeRedirectUrl(socialToken, user.getId());
             response.addHeader("Authorization", socialToken);
         } else {
-            System.out.println("nickName = " + nickName);
-            System.out.println("socialType = " + socialType);
-            url = sendInfoToRedirectUrl(email, nickName, socialType);
-            response.setCharacterEncoding("UTF-8");
-            response.setStatus(HttpServletResponse.SC_ACCEPTED);
+            if (socialType.equals("naver")) {
+                response.setCharacterEncoding("UTF-8");
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                url = sendInfoToNaverRedirectUrl(email, nickName, socialType, mobile, gender);
+            } else {
+                System.out.println("nickName = " + nickName);
+                System.out.println("socialType = " + socialType);
+                url = sendInfoToRedirectUrl(email, nickName, socialType);
+                response.setCharacterEncoding("UTF-8");
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+            }
         }
         getRedirectStrategy().sendRedirect(request, response, url);
     }
@@ -82,6 +96,20 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String encode = URLEncoder.encode(nickName, StandardCharsets.UTF_8);
 
         return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/social" + e + email + n + encode + s + socialType)
+                .build().toUriString();
+    }
+
+    private String sendInfoToNaverRedirectUrl(String email, String nickName, String socialType, String mobile, String gender) throws UnsupportedEncodingException {
+        String e = "/email=";
+        String n = "/nickname=";
+        String s = "/socialType=";
+        String m = "/mobile";
+        String g = "/gender";
+
+        String encode = URLEncoder.encode(nickName, StandardCharsets.UTF_8);
+
+        return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/social" + e + email
+                        + n + encode + s + socialType + m + mobile + g + gender)
                 .build().toUriString();
     }
 
