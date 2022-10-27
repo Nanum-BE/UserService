@@ -85,7 +85,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private String sendExistInfoToRedirectUrI(String token, Long userId) {
         return UriComponentsBuilder.fromUriString("https://nanum.site/user-service/api/v1/oauth/social"
-                        + "/" + userId + "/" + Role.USER + "/" + token)
+                        + "/userId=" + userId + "/role=" + Role.USER + "/token=" + token)
                 .build().toUriString();
     }
 
