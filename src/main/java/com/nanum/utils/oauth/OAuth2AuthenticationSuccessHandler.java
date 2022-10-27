@@ -39,6 +39,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String socialType;
         String nickName;
 
+        System.out.println("oAuth2User.getAttributes() = " + oAuth2User.getAttributes());
         if (oAuth2User.getAttributes().containsKey("kakao_account")) {
             socialType = "kakao";
             kakao_account = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
@@ -46,9 +47,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             email = String.valueOf(kakao_account.get("email"));
             nickName = String.valueOf(kakao_profile.get("nickname").toString());
         } else {
+            log.info(String.valueOf(oAuth2User.getAttributes().keySet()));
             email = String.valueOf(oAuth2User.getAttributes().get("email"));
-            nickName = String.valueOf(oAuth2User.getAttributes().get("nickname"));
-            socialType = "kakao";
+            nickName = String.valueOf(oAuth2User.getAttributes().get("name"));
+            socialType = "google";
         }
 
         User user = userRepository.findByEmail(email);
@@ -58,6 +60,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             url = makeRedirectUrl(socialToken, user.getId());
             response.addHeader("Authorization", socialToken);
         } else {
+            System.out.println("nickName = " + nickName);
+            System.out.println("socialType = " + socialType);
             url = sendInfoToRedirectUrl(email, nickName, socialType);
             response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
