@@ -36,6 +36,7 @@ spring:
             scope: profile, email
             client-id: 974264929560-46jc5bmg2s54u18vcpr649c231jc4c4b.apps.googleusercontent.com
             client-secret: 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
+            redirect-uri: 'https://nanum.site/login/oauth2/code/social'
 
         provider:
           naver:
