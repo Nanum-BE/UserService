@@ -41,7 +41,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                 new ExceptionResponse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분 ss초")),
                         ex.getMessage(), request.getDescription(false));
 
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.ALREADY_REPORTED);
     }
 
     @ExceptionHandler(PasswordDismatchException.class)
@@ -61,6 +61,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NO_CONTENT);
     }
+
     @ExceptionHandler(UserNotFoundException.class)
     public final ResponseEntity<Object> handleUserNotFoundException(Exception ex, WebRequest request){
         ExceptionResponse exceptionResponse =

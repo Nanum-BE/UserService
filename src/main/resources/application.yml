@@ -1,5 +1,5 @@
 server:
-  port: 9091
+  port: 0
 
 spring:
   servlet:
@@ -61,6 +61,7 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+
 
 #token:
 #  expiration_time: 864000000
