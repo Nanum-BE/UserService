@@ -34,12 +34,12 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
         response.setCharacterEncoding("UTF-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(204);
-        LocalDateTime date = LocalDateTime.now();
 
-        BaseResponse<HttpServletResponse> responseBaseResponse = new BaseResponse<>(response);
+        String result = "로그인 정보를 다시 확인해주세요!";
 
-        log.info(String.valueOf(response.getStatus()));
+        BaseResponse<String> baseResponse = new BaseResponse<>(result);
 
-        mapper.writeValue(response.getWriter(), responseBaseResponse);
+
+        mapper.writeValue(response.getWriter(), baseResponse);
     }
 }

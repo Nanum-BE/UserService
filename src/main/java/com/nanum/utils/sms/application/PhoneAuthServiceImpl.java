@@ -2,6 +2,7 @@ package com.nanum.utils.sms.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nanum.userservice.user.infrastructure.UserRepository;
 import com.nanum.utils.sms.dto.MessageDto;
 import com.nanum.utils.sms.dto.MessageDtoReq;
 import com.nanum.utils.sms.vo.ConfirmSMS;
@@ -35,6 +36,7 @@ import java.util.Random;
 public class PhoneAuthServiceImpl implements PhoneAuthService {
     private final Environment env;
     private final RedisService redisService;
+    private final UserRepository userRepository;
 
     //    @Value("${sms.serviceId}")
     private String serviceId;
@@ -117,17 +119,23 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
         String time = Long.toString(System.currentTimeMillis());
         List<MessageDto> messagesDtos = new ArrayList<>();
         if (status == 0) {
-            messagesDtos.add(new MessageDto(tel, "투어 신청이 승인완료되었습니다."));
+            messagesDtos.add(new MessageDto(tel, "[나눔]" +
+                    "투어 신청이 승인완료되었습니다."));
         } else if (status == 1) {
-            messagesDtos.add(new MessageDto(tel, "투어 신청이 호스트에 의해 거절되었습니다."));
+            messagesDtos.add(new MessageDto(tel, "[나눔]" +
+                    "투어 신청이 호스트에 의해 거절되었습니다."));
         } else if (status == 2) {
-            messagesDtos.add(new MessageDto(tel, "신청하신 투어가 완료되었습니다 감사합니다."));
+            messagesDtos.add(new MessageDto(tel, "[나눔]" +
+                    "신청하신 투어가 완료되었습니다 감사합니다."));
         } else if (status == 3) {
-            messagesDtos.add(new MessageDto(tel, "입주 신청이 승인되었습니다."));
+            messagesDtos.add(new MessageDto(tel, "[나눔]" +
+                    "입주 신청이 승인되었습니다."));
         } else if (status == 4) {
-            messagesDtos.add(new MessageDto(tel, "입주 신청이 호스트에 의해 거절되었습니다."));
+            messagesDtos.add(new MessageDto(tel, "[나눔]" +
+                    "입주 신청이 호스트에 의해 거절되었습니다."));
         } else if (status == 5) {
-            messagesDtos.add(new MessageDto(tel, "호스트와의 입주 계약이 완료되었습니다! " +
+            messagesDtos.add(new MessageDto(tel, "[나눔]" +
+                    "호스트와의 입주 계약이 완료되었습니다! " +
                     "입주를 축하드립니다 :)"));
         }
 
@@ -221,6 +229,8 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
         String success;
         if (isVerify(requestSMS)) {
             success = "fail";
+        } else if (!isVerify(requestSMS) && userRepository.existsByPhone(requestSMS.getPhoneNumber())) {
+            success = "exist";
         } else {
             redisService.removeSmsCertification(requestSMS.getPhoneNumber());
             success = "ok";

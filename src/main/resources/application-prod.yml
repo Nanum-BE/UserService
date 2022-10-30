@@ -1,4 +1,10 @@
 spring:
+#  redis:
+#    host: nanum-redis.redis.cache.windows.net
+#    password: BDAMHPDXwVE1lmSGjYHPNOuZBE23xHXLqAzCaGLPsIU=
+#    port: 6380
+#    ssl: true
+
   redis:
     host: 3.37.166.100
     password: 1234

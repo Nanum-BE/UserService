@@ -19,9 +19,29 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @Slf4j
+@ConfigurationProperties(prefix = "spring.redis")
 @Setter
 public class RedisConfig {
 
+    //    private String host;
+//    private String password;
+//
+//    @Bean
+//    @Primary
+//    public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory(RedisConfiguration defaultRedisConfig) {
+//        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+//                .useSsl().build();
+//        return new LettuceConnectionFactory(defaultRedisConfig, clientConfig);
+//    }
+//
+//    @Bean
+//    public RedisConfiguration defaultRedisConfig() {
+//        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+//        config.setHostName(host);
+//        config.setPassword(RedisPassword.of(password));
+//        config.setPort(6380);
+//        return config;
+//    }
     @Value("${spring.redis.host}")
     private String host;
 

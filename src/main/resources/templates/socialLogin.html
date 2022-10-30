@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/templates/facebook-connect.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
@@ -17,10 +17,18 @@
     </form>
 </div>
 
+<div class="login-box">
+    <h2>Social Login Button</h2>
+    <a class="facebook-connect.class" href="#"><i class="icon fa fa-facebook"></i>Login With Facebook</a>
+    <a href="#" class="social-button" id="facebook-connect"> <span>Connect with Facebook</span></a>
+    <a href="#" class="social-button" id="google-connect"> <span>Connect with Google</span></a>
+    <a href="#" class="social-button" id="twitter-connect"> <span>Connect with Twitter</span></a>
+    <a href="#" class="social-button" id="linkedin-connect"> <span>Connect with LinkedIn</span></a>
+</div>
+
 <nav id="nav">
     <div class="text-right">
-        {{#user}}
-        <span class="mx-3">{{user}}님 안녕하세요!</span>
+        <span class="mx-3">강민수님 안녕하세요!</span>
         <a href="/logout" class="btn btn-outline-dark">로그아웃</a>
         <a href="/modify" class="btn btn-outline-dark bi bi-gear"></a>
         {{/user}}

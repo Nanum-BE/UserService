@@ -53,10 +53,6 @@ public class PhoneAuthController {
     @PostMapping("/v1/sms/confirm")
     public ResponseEntity<String> ConfirmMessage(@RequestBody ConfirmSMS requestSMS) {
 
-        if (userRepository.existsByPhone(requestSMS.getPhoneNumber())) {
-            throw new UserAlreadyExistException();
-        }
-
         ResponseEntity<String> body;
         String message = phoneAuthServiceImpl.confirmMessage(requestSMS);
         String value;
@@ -64,6 +60,9 @@ public class PhoneAuthController {
         if (Objects.equals(message, "ok")) {
             value = "인증번호 확인되었습니다";
             body = ResponseEntity.status(HttpStatus.OK).body(value);
+        } else if (Objects.equals(message, "exist")){
+            value = "이미 가입되신 전화번호입니다";
+            body = ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(value);
         } else {
             value = "인증번호를 다시 확인해주세요!!";
             body = ResponseEntity.status(HttpStatus.NO_CONTENT).body(value);

@@ -1,6 +1,6 @@
 spring:
   redis:
-    host: localhost
+    host: 13.125.19.213
     password: 1234
     port: 6379
   datasource:
@@ -18,4 +18,4 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://127.0.0.1:8761/eureka
+      defaultZone: http://13.125.19.213:8761/eureka
