@@ -41,7 +41,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String mobile = null;
         String gender = null;
 
-        System.out.println("oAuth2User.getAttributes() = " + oAuth2User.getAttributes());
         if (oAuth2User.getAttributes().containsKey("kakao_account")) {
             socialType = "kakao";
             kakao_account = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
@@ -49,7 +48,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             email = String.valueOf(kakao_account.get("email"));
             nickName = String.valueOf(kakao_profile.get("nickname").toString());
         } else if (oAuth2User.getAttributes().containsKey("mobile")) {
-            log.info(String.valueOf(oAuth2User.getAttributes().keySet()));
             email = String.valueOf(oAuth2User.getAttributes().get("email"));
             nickName = String.valueOf(oAuth2User.getAttributes().get("nickname"));
             mobile = String.valueOf(oAuth2User.getAttributes().get("mobile"));
@@ -73,8 +71,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 url = sendInfoToNaverRedirectUrl(email, nickName, socialType, mobile, gender);
             } else {
-                System.out.println("nickName = " + nickName);
-                System.out.println("socialType = " + socialType);
                 url = sendInfoToRedirectUrl(email, nickName, socialType);
                 response.setCharacterEncoding("UTF-8");
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
