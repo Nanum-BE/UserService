@@ -182,7 +182,7 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
     public ResponseSMS sendMsg(String tel, String rand) throws Exception {
         String time = Long.toString(System.currentTimeMillis());
         List<MessageDto> messagesDtos = new ArrayList<>();
-        messagesDtos.add(new MessageDto(tel, "[" + rand + "]를 입력해 주세요."));
+        messagesDtos.add(new MessageDto(tel, "[나눔] 인증번호[" + rand + "]를 입력해 주세요."));
 
         this.serviceId = env.getProperty("sms.serviceId");
         this.accessKey = env.getProperty("sms.accessKey");
