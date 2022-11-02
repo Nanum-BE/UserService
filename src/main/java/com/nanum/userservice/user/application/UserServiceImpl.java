@@ -6,10 +6,7 @@ import com.nanum.exception.UserNotFoundException;
 import com.nanum.userservice.user.domain.User;
 import com.nanum.userservice.user.dto.UserDto;
 import com.nanum.userservice.user.infrastructure.UserRepository;
-import com.nanum.userservice.user.vo.ModifyPasswordRequest;
-import com.nanum.userservice.user.vo.UserModifyRequest;
-import com.nanum.userservice.user.vo.UserResponse;
-import com.nanum.userservice.user.vo.UsersResponse;
+import com.nanum.userservice.user.vo.*;
 import com.nanum.utils.oauth.vo.OAuthUserRequest;
 import com.nanum.utils.s3.S3UploaderService;
 import com.nanum.utils.s3.dto.S3UploadDto;
@@ -161,20 +158,49 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     }
 
     @Override
-    public User signOAuthUser(OAuthUserRequest userRequest) {
+    public User signOAuthUser(OAuthUserRequest userRequest, MultipartFile multipartFile) {
+        S3UploadDto s3UploadDto;
+        User user;
+        if (multipartFile != null) {
+            try {
+                s3UploadDto = s3UploaderService.upload(multipartFile, "myspharosbucket", "userProfile");
 
-        User user = userRepository.save(User.builder()
-                .email(userRequest.getEmail())
-                .gender(userRequest.getGender())
-                .role(Role.USER)
-                .isNoteReject(false)
-                .loginFailCnt(0)
-                .warnCnt(0)
-                .nickname(userRequest.getNickname())
-                .socialType(userRequest.getSocialType())
-                .phone(userRequest.getPhone())
-                .pwd(bCryptPasswordEncoder.encode("1"))
-                .build());
+                user = User.builder()
+                        .email(userRequest.getEmail())
+                        .pwd(bCryptPasswordEncoder.encode("1"))
+                        .nickname(userRequest.getNickname())
+                        .role(userRequest.getRole())
+                        .phone(userRequest.getPhone())
+                        .gender(userRequest.getGender())
+                        .isNoteReject(false)
+                        .loginFailCnt(0)
+                        .warnCnt(0)
+                        .socialType(userRequest.getSocialType())
+                        .profileImgPath(s3UploadDto.getImgUrl())
+                        .saveName(s3UploadDto.getSaveName())
+                        .originName(s3UploadDto.getOriginName())
+                        .build();
+
+                userRepository.save(user);
+
+            } catch (IOException e) {
+                throw new ProfileImgNotFoundException();
+            }
+        } else {
+            user = userRepository.save(User.builder()
+                    .email(userRequest.getEmail())
+                    .gender(userRequest.getGender())
+                    .role(userRequest.getRole())
+                    .isNoteReject(false)
+                    .loginFailCnt(0)
+                    .warnCnt(0)
+                    .nickname(userRequest.getNickname())
+                    .socialType(userRequest.getSocialType())
+                    .phone(userRequest.getPhone())
+                    .pwd(bCryptPasswordEncoder.encode("1"))
+                    .build());
+            userRepository.save(user);
+        }
 
         return user;
     }
@@ -239,6 +265,19 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
                 .collect(Collectors.toList());
 
         return users.stream().map(UserResponse::of).collect(Collectors.toList());
+    }
+
+    @Override
+    public UserPhoneResponse retrievePhoneByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            throw new UserNotFoundException("찾으시는 계정이 존재하지 않습니다");
+        }
+
+        return UserPhoneResponse.builder()
+                .phoneNumber(user.getPhone())
+                .build();
     }
 
     @Override

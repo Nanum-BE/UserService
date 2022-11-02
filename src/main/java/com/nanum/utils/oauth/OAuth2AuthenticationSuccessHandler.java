@@ -80,33 +80,34 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String sendExistInfoToRedirectUrI(String token, Long userId) {
-        return UriComponentsBuilder.fromUriString("https://nanum.site/user-service/api/v1/oauth/social"
-                        + "/userId=" + userId + "/role=" + Role.USER + "/token=" + token)
+        String u = "?userId=";
+        return UriComponentsBuilder.fromUriString("http://localhost:3000/outh/redirect"
+                        + u + userId + "&role=" + Role.USER + "&token=" + token)
                 .build().toUriString();
     }
 
     private String sendInfoToRedirectUrl(String email, String nickName, String socialType) {
-        String e = "/email=";
-        String n = "/nickname=";
-        String s = "/socialType=";
+        String e = "?email=";
+        String n = "&nickname=";
+        String s = "&socialType=";
         String encode = URLEncoder.encode(nickName, StandardCharsets.UTF_8);
 
-        return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/social" + e + email + n + encode + s + socialType)
+        return UriComponentsBuilder.fromUriString("http://localhost:3000/outh/redirect" + e + email + n + encode + s + socialType)
                 .build().toUriString();
     }
 
     private String sendInfoToNaverRedirectUrl(String email, String nickName, String socialType, String mobile, String gender) {
-        String e = "/email=";
-        String n = "/nickname=";
-        String s = "/socialType=";
-        String m = "/mobile=";
-        String g = "/gender=";
+        String e = "?email=";
+        String n = "&nickname=";
+        String s = "&socialType=";
+        String m = "&mobile=";
+        String g = "&gender=";
 
         String encode = URLEncoder.encode(nickName, StandardCharsets.UTF_8);
 
         String num = mobile.replaceAll("-", "");
 
-        return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/social" + e + email
+        return UriComponentsBuilder.fromUriString("http://localhost:3000/outh/redirect" + e + email
                         + n + encode + s + socialType + m + num + g + gender)
                 .build().toUriString();
     }

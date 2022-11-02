@@ -17,6 +17,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByPhone(String phone);
 
+    User findByPhone(String phone);
+
+    boolean existsByPhoneAndEmail(String phone, String email);
+
     @Transactional
     @Modifying
     @Query("update User u set u.warnCnt = u.warnCnt + 1 where u.id = :id")

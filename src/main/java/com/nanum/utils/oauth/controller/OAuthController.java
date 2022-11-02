@@ -18,8 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,11 +48,17 @@ public class OAuthController {
 
     @Operation(summary = "소셜 회원가입 요청 api", description = "추가 정보들 입력한 후 회원가입 요청")
     @PostMapping("/signup")
-    public ResponseEntity<BaseResponse<HashMap<Object, Object>>> retrieveUserInfo(@RequestBody OAuthUserRequest userRequest) {
+    public ResponseEntity<BaseResponse<HashMap<Object, Object>>> retrieveUserInfo(@Valid @RequestPart OAuthUserRequest userRequest
+            , @RequestPart(value = "profileImg", required = false) MultipartFile multipartFile) {
+        User user;
 
-        User user = userService.signOAuthUser(userRequest);
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            user = userService.signOAuthUser(userRequest, multipartFile);
+        } else {
+            user = userService.signOAuthUser(userRequest, null);
+        }
+
         String socialToken = jwtTokenProvider.createSocialToken(user.getId());
-
         HashMap<Object, Object> result = new HashMap<>();
 
         result.put("결과", "회원가입 완료");
@@ -64,6 +72,6 @@ public class OAuthController {
     public String socialSuccess(@PathVariable Long userId, @PathVariable Role role, @PathVariable String token) {
 
         return UriComponentsBuilder.fromUriString("https://nanum.site/login/oauth2/code/social" + "/userId=" + userId
-        + "/role=" + role + "/token=" + token).toUriString();
+                + "/role=" + role + "/token=" + token).toUriString();
     }
 }

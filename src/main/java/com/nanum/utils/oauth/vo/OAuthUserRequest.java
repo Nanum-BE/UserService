@@ -1,5 +1,6 @@
 package com.nanum.utils.oauth.vo;
 
+import com.nanum.config.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -25,6 +26,8 @@ public class OAuthUserRequest {
     private String gender;
 
     private String nickname;
+
+    private Role role;
 
     private String socialType;
 

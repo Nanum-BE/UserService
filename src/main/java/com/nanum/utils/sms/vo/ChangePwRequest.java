@@ -1,11 +1,12 @@
 package com.nanum.utils.sms.vo;
 
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
-public class ConfirmSMS {
+public class ChangePwRequest {
+
     private String phoneNumber;
-    private String content;
+
+    private String email;
+
 }

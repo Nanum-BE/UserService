@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
 import java.util.List;
 
 @RestController
@@ -199,5 +200,11 @@ public class UserController {
     public ResponseEntity<Object> retrieveUserInfoByIds(@PathVariable List<Long> userId) {
         List<UserResponse> responses = userService.retrieveUserInfoByIds(userId);
         return ResponseEntity.status(HttpStatus.OK).body(new BaseResponse<>(responses));
+    }
+
+    @GetMapping("/users/change/pw/email/{email}")
+    public ResponseEntity<Object> retrievePhoneByEmail(@PathVariable String email) {
+        UserPhoneResponse response = userService.retrievePhoneByEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).body(new BaseResponse<>(response));
     }
 }

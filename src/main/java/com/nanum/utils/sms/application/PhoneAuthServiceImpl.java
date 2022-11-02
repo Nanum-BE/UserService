@@ -238,6 +238,16 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
         return success;
     }
 
+    public String changePwConfirmMessage(ConfirmSMS confirmSMS){
+        String success;
+        if (isVerify(confirmSMS)) {
+            success = "fail";
+        } else {
+            success = "ok";
+        }
+        return success;
+    }
+
     private boolean isVerify(ConfirmSMS requestDto) {
         return !(redisService.hasKey(requestDto.getPhoneNumber()) &&
                 redisService.getSmsCertification(requestDto.getPhoneNumber())
