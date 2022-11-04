@@ -1,6 +1,5 @@
 package com.nanum.userservice.user.application;
 
-import com.nanum.config.Role;
 import com.nanum.exception.ProfileImgNotFoundException;
 import com.nanum.exception.UserNotFoundException;
 import com.nanum.userservice.user.domain.User;
@@ -12,16 +11,12 @@ import com.nanum.utils.s3.S3UploaderService;
 import com.nanum.utils.s3.dto.S3UploadDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -35,9 +30,10 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService, AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final S3UploaderService s3UploaderService;
 
+    //회원가입
+    @Transactional
     @Override
     public boolean createUser(UserDto userDto, MultipartFile multipartFile) {
         S3UploadDto s3UploadDto;
@@ -45,118 +41,60 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
         if (multipartFile != null) {
             try {
                 s3UploadDto = s3UploaderService.upload(multipartFile, "myspharosbucket", "userProfile");
-
-                User newUser = User.builder()
-                        .email(userDto.getEmail())
-                        .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
-                        .nickname(userDto.getNickname())
-                        .role(userDto.getRole())
-                        .phone(userDto.getPhone())
-                        .gender(userDto.getGender())
-                        .isNoteReject(userDto.isNoteReject())
-                        .profileImgPath(s3UploadDto.getImgUrl())
-                        .saveName(s3UploadDto.getSaveName())
-                        .originName(s3UploadDto.getOriginName())
-                        .build();
-
-                userRepository.save(newUser);
-
+                userRepository.save(userDto.toEntity(s3UploadDto));
             } catch (IOException e) {
                 throw new ProfileImgNotFoundException();
             }
         } else {
-            userRepository.save(User.builder()
-                    .email(userDto.getEmail())
-                    .pwd(bCryptPasswordEncoder.encode(userDto.getPwd()))
-                    .isNoteReject(userDto.isNoteReject())
-                    .role(userDto.getRole())
-                    .nickname(userDto.getNickname())
-                    .phone(userDto.getPhone())
-                    .gender(userDto.getGender())
-                    .build());
+            userRepository.save(userDto.toEntity(null));
         }
-
         return true;
     }
 
+    //이메일 중복 검사
+    @Transactional
     @Override
     public boolean checkEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
+    //닉네임 중복 검사
+    @Transactional
     @Override
     public boolean checkNickName(String nickName) {
         return userRepository.existsByNickname(nickName);
     }
 
+    //회원정보수정
+    @Transactional
     @Override
     public void modifyUser(Long userId, UserModifyRequest request, MultipartFile file) {
-        User user = userRepository.findById(userId).get();
-
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다"));
         S3UploadDto s3UploadDto;
 
         if (file != null) {
             try {
                 s3UploadDto = s3UploaderService.upload(file, "myspharosbucket", "userProfile");
-
-                userRepository.save(User.builder()
-                        .id(userId)
-                        .email(user.getEmail())
-                        .role(user.getRole())
-                        .loginFailCnt(user.getLoginFailCnt())
-                        .warnCnt(user.getWarnCnt())
-                        .nickname(request.getNickname())
-                        .phone(request.getPhone())
-                        .profileImgPath(s3UploadDto.getImgUrl())
-                        .saveName(s3UploadDto.getSaveName())
-                        .originName(s3UploadDto.getOriginName())
-                        .pwd(user.getPwd())
-                        .isNoteReject(request.getIsNoteReject())
-                        .gender(request.getGender())
-                        .build());
-
+                user.modifyUserWithImg(request, s3UploadDto);
             } catch (IOException e) {
                 throw new ProfileImgNotFoundException();
             }
         } else
-            userRepository.save(User.builder()
-                    .id(userId)
-                    .email(user.getEmail())
-                    .role(user.getRole())
-                    .loginFailCnt(user.getLoginFailCnt())
-                    .warnCnt(user.getWarnCnt())
-                    .nickname(request.getNickname())
-                    .phone(request.getPhone())
-                    .profileImgPath(request.getImgUrl())
-                    .saveName(user.getSaveName())
-                    .originName(user.getOriginName())
-                    .pwd(user.getPwd())
-                    .isNoteReject(request.getIsNoteReject())
-                    .gender(request.getGender())
-                    .build());
+            user.modUser(request);
     }
 
+    //비밀번호 변경
+    @Transactional
     @Override
     public void modifyUserPw(Long userId, ModifyPasswordRequest passwordRequest) {
-        User user = userRepository.findById(userId).get();
-
-        userRepository.save(User.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .gender(user.getGender())
-                .warnCnt(user.getWarnCnt())
-                .loginFailCnt(user.getLoginFailCnt())
-                .role(user.getRole())
-                .nickname(user.getNickname())
-                .phone(user.getPhone())
-                .profileImgPath(user.getProfileImgPath())
-                .isNoteReject(user.getIsNoteReject())
-                .pwd(bCryptPasswordEncoder.encode(passwordRequest.getNewPw()))
-                .build());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다"));
+        user.changePw(passwordRequest);
     }
 
+    //소셜 로그인 회원 등록
+    @Transactional
     @Override
     public User signOAuthUser(OAuthUserRequest userRequest, MultipartFile multipartFile) {
         S3UploadDto s3UploadDto;
@@ -164,41 +102,13 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
         if (multipartFile != null) {
             try {
                 s3UploadDto = s3UploaderService.upload(multipartFile, "myspharosbucket", "userProfile");
-
-                user = User.builder()
-                        .email(userRequest.getEmail())
-                        .pwd(bCryptPasswordEncoder.encode("1"))
-                        .nickname(userRequest.getNickname())
-                        .role(userRequest.getRole())
-                        .phone(userRequest.getPhone())
-                        .gender(userRequest.getGender())
-                        .isNoteReject(false)
-                        .loginFailCnt(0)
-                        .warnCnt(0)
-                        .socialType(userRequest.getSocialType())
-                        .profileImgPath(s3UploadDto.getImgUrl())
-                        .saveName(s3UploadDto.getSaveName())
-                        .originName(s3UploadDto.getOriginName())
-                        .build();
-
+                user = userRequest.toEntity(s3UploadDto);
                 userRepository.save(user);
-
             } catch (IOException e) {
                 throw new ProfileImgNotFoundException();
             }
         } else {
-            user = userRepository.save(User.builder()
-                    .email(userRequest.getEmail())
-                    .gender(userRequest.getGender())
-                    .role(userRequest.getRole())
-                    .isNoteReject(false)
-                    .loginFailCnt(0)
-                    .warnCnt(0)
-                    .nickname(userRequest.getNickname())
-                    .socialType(userRequest.getSocialType())
-                    .phone(userRequest.getPhone())
-                    .pwd(bCryptPasswordEncoder.encode("1"))
-                    .build());
+            user = userRequest.toEntity(null);
             userRepository.save(user);
         }
 
@@ -238,9 +148,7 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     @Transactional(readOnly = true)
     @Override
     public UsersResponse retrieveUsers(String email) {
-
         User user = userRepository.findByEmail(email);
-
         return UsersResponse.of(user);
     }
 
@@ -250,7 +158,6 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
         if (users.size() < 1) {
             throw new UserNotFoundException(String.format("users[%s] not found", Longs));
         }
-
         return users.stream()
                 .map(UsersResponse::of)
                 .collect(Collectors.toList());
@@ -261,12 +168,13 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     public List<UserResponse> retrieveUserInfoByIds(List<Long> userId) {
         List<User> users = userId
                 .stream()
-                .map(a -> userRepository.findById(a).get())
+                .map(a -> userRepository.findById(a).orElseThrow(() -> new UserNotFoundException("users not found")))
                 .collect(Collectors.toList());
 
         return users.stream().map(UserResponse::of).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public UserPhoneResponse retrievePhoneByEmail(String email) {
         User user = userRepository.findByEmail(email);
@@ -283,8 +191,7 @@ public class UserServiceImpl implements UserService, AuthenticationSuccessHandle
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        Authentication authentication)
-            throws IOException, ServletException {
+                                        Authentication authentication) {
 
     }
 }

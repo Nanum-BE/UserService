@@ -1,6 +1,8 @@
 package com.nanum.utils.oauth.vo;
 
 import com.nanum.config.Role;
+import com.nanum.userservice.user.domain.User;
+import com.nanum.utils.s3.dto.S3UploadDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -8,9 +10,8 @@ import org.hibernate.annotations.Comment;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-@Data
-@Builder
-
+@Getter
+@NoArgsConstructor
 public class OAuthUserRequest {
 
     private String email;
@@ -30,5 +31,19 @@ public class OAuthUserRequest {
     private Role role;
 
     private String socialType;
+
+    public User toEntity(S3UploadDto s3UploadDto) {
+        return User.builder()
+                .email(email)
+                .pwd("1")
+                .gender(gender)
+                .phone(phone)
+                .nickname(nickname)
+                .role(role)
+                .socialType(socialType)
+                .s3UploadDto(s3UploadDto)
+                .isNoteReject(false)
+                .build();
+    }
 
 }

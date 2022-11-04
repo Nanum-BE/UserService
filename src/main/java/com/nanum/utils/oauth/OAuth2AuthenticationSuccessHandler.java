@@ -81,7 +81,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private String sendExistInfoToRedirectUrI(String token, Long userId) {
         String u = "?userId=";
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/outh/redirect"
+        return UriComponentsBuilder.fromUriString("https://nanum.vercel.app"
                         + u + userId + "&role=" + Role.USER + "&token=" + token)
                 .build().toUriString();
     }
@@ -92,7 +92,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String s = "&socialType=";
         String encode = URLEncoder.encode(nickName, StandardCharsets.UTF_8);
 
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/outh/redirect" + e + email + n + encode + s + socialType)
+        return UriComponentsBuilder.fromUriString("https://nanum.vercel.app" + e + email + n + encode + s + socialType)
                 .build().toUriString();
     }
 
@@ -107,7 +107,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String num = mobile.replaceAll("-", "");
 
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/outh/redirect" + e + email
+        return UriComponentsBuilder.fromUriString("https://nanum.vercel.app" + e + email
                         + n + encode + s + socialType + m + num + g + gender)
                 .build().toUriString();
     }

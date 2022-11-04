@@ -50,8 +50,8 @@ public class JwtTokenProvider {
 
         User user = userRepository.findById(userId).get();
 
-        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-        claims.put("userId", userId);
+        Claims claims = Jwts.claims().setSubject(user.getEmail());
+        claims.put("Id", userId);
         claims.put("role", user.getRole());
 
         Date now = new Date();
@@ -71,7 +71,6 @@ public class JwtTokenProvider {
     }
 
     public String getUserPk(String token) {
-
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getId();
     }
 
